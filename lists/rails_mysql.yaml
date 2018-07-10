@@ -1,0 +1,34 @@
+name: Rails MySQL Migration
+version: 1
+triggers:
+  path: db/migrations/**/*.rb
+list:
+  - category: General
+    checks:
+      - Migrations are reversible, in the event of a reversion, or one way is approved
+  - category: Renamed column
+    checks:
+      - Renamed columns have been added to the model's `ignored_columns`
+    triggers:
+      files_include:
+        - rename_column
+        - /ALTER TABLE .+ CHANGE/i
+  - category: Dropped column
+    checks:
+      - Dropped columns have been added to the model's `ignored_columns`
+    triggers:
+      changes_include:
+        - remove_column
+        - /ALTER TABLE .+ DROP COLUMN/i
+  - category: Data modification
+    checks:
+      - Tables are small enough to update in a single transaction
+      - Updates are not better written as a background job
+      - Migrations handles new data being added while in progress
+    triggers:
+      changes_include:
+        - UPDATE
+        - INSERT
+        - .update
+        - .update_all
+        - .save

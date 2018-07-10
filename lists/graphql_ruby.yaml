@@ -1,0 +1,25 @@
+name: GraphQL Ruby Checklist
+version: 1
+triggers:
+  path: app/graphql/**/*.rb
+list:
+  - category: Breaking Changes
+    checks:
+      - Deleted or renamed fields and types are not referenced by any clients
+    triggers:
+      deletions_include:
+        - /field :\w+/
+  - category: Performance
+    checks:
+      - Fields that access the DB make use of Loaders to avoid N+1 queries
+  - category: New APIs
+    checks:
+      - check: Arguments / Input Objects prefer strong types such as Enums over Strings
+        triggers:
+          additions_include:
+            - argument
+            - input_field
+      - check: Fields are authorized with appropriate permissions
+        triggers:
+          additions_include:
+            - /field :\w+/
