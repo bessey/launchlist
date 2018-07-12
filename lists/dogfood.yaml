@@ -1,8 +1,0 @@
-name: Checklist Checklist!
-version: 1
-triggers:
-  path: lists/**/*.yaml
-list:
-  - A typical PR checklist should be <=5 items long, to avoid parts being skimmed or ignored
-  - Checks should not be questions, but rather commanding statements
-  - Checks should be written in present perfect tense for consistency across lists

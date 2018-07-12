@@ -1,0 +1,10 @@
+name: Checklist Checklist!
+version: 1
+triggers:
+  path: lists/**/*.yaml
+list:
+  - A typical PR should have <=5 check items visible, to avoid parts being skimmed or ignored
+  - Check items are commanding statements, not questions
+  - Check items should be written in present perfect tense for consistency across lists
+  - Check items suggest external actionable tasks, not trivial fixes to code that could be caught by a linter
+  - Check triggers are specific enough to avoid developer fatigue, broad enough to consistently catch issues

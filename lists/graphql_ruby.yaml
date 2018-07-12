@@ -23,3 +23,11 @@ list:
         triggers:
           additions_include:
             - /field :\w+/
+      - check: Field names are clear, unambiguous, and unlikely to conflict with future fields
+        triggers:
+          additions_include:
+            - /field :\w+/
+      - check: APIs are friendly to the consumer, not necessarily 1:1 with database records
+        triggers:
+          additions_include:
+            - /field :\w+/
