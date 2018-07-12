@@ -1,7 +1,7 @@
 name: GraphQL Ruby Checklist
 version: 1
 triggers:
-  path: app/graphql/**/*.rb
+  paths: app/graphql/**/*.rb
 list:
   - category: Breaking Changes
     checks:

@@ -1,7 +1,7 @@
 name: Rails MySQL Migration
 version: 1
 triggers:
-  path: db/migrations/**/*.rb
+  paths: db/migrations/**/*.rb
 list:
   - category: General
     checks:

@@ -1,7 +1,7 @@
 name: Checklist Checklist!
 version: 1
 triggers:
-  path: lists/**/*.yaml
+  paths: lists/**/*.yaml
 list:
   - A typical PR should have <=5 check items visible, to avoid parts being skimmed or ignored
   - Check items are commanding statements, not questions
