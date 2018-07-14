@@ -11,7 +11,7 @@ RSpec.describe Checker::Config do
     end
   end
 
-  context "exercise with a complex checklist", :focus do
+  context "exercise with a complex checklist" do
     before(:all) do
       path = Pathname.new("spec/fixtures/rails_mysql.yaml")
       @config = Checker::Config.new(path)
@@ -23,7 +23,7 @@ RSpec.describe Checker::Config do
     describe "#config" do
       # Avoid re-parsing for every test
       before(:all) { @config.parse }
-      subject { @config.config }
+      subject { @config }
       describe "#name" do
         subject { super().name }
         it { is_expected.to eq "Rails MySQL Migration" }
@@ -37,7 +37,7 @@ RSpec.describe Checker::Config do
         it { is_expected.not_to be_nil }
         describe "#paths" do
           subject { super().paths }
-          it { is_expected.to eq(["db/migrations/**/*.rb"]) }
+          it { is_expected.to contain_exactly("db/migrations/**/*.rb") }
         end
       end
       describe "#list" do
@@ -53,7 +53,7 @@ RSpec.describe Checker::Config do
             it { is_expected.not_to be_nil }
             describe "#paths" do
               subject { super().paths }
-              it { is_expected.to eq(["one_path", "another_path"]) }
+              it { is_expected.to contain_exactly("one_path", "another_path") }
             end
           end
           describe "#checks" do
@@ -76,7 +76,7 @@ RSpec.describe Checker::Config do
                 it { is_expected.not_to be_nil }
                 describe "#paths" do
                   subject { super().paths }
-                  it { is_expected.to eq(["argument", "input_field"]) }
+                  it { is_expected.to contain_exactly("argument", "input_field") }
                 end
               end
             end

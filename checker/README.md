@@ -6,9 +6,17 @@ TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
+Install rugged on Mac OSX:
+
+```bash
+brew install libgit2
+gem install rugged -- --use-system-libraries
+```
+
 Add this line to your application's Gemfile:
 
 ```ruby
+
 gem 'checker'
 ```
 

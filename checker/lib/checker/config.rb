@@ -10,6 +10,7 @@ module Checker
         end
       end
     end
+    extend Forwardable
 
     Config = Struct.new(:name, :version, :triggers, :list)
     CheckSet = Struct.new(:category, :checks, :triggers)
@@ -17,11 +18,13 @@ module Checker
     Check = Struct.new(:check, :triggers)
 
     attr_reader :path, :yaml, :errors, :config
+    def_delegators(:config, *Config.members)
 
     def initialize(path)
       @path = path
       @yaml = YAML.load_file(path)
     end
+
 
     def valid?
       !@errors || @errors.length.zero?
@@ -41,9 +44,9 @@ module Checker
     private
 
     def parse_trigger_set(trigger_set)
-      return TriggerSet.new([]) unless trigger_set
+      return TriggerSet.new(Set.new) unless trigger_set
       TriggerSet.new(
-        Array(trigger_set["paths"]).compact
+        Set.new(Array(trigger_set["paths"]).compact)
       )
     end
 
