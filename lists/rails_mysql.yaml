@@ -10,7 +10,7 @@ list:
     checks:
       - Renamed columns have been added to the model's `ignored_columns`
     triggers:
-      files_include:
+      paths:
         - rename_column
         - /ALTER TABLE .+ CHANGE/i
   - category: Dropped column
