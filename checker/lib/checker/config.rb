@@ -11,8 +11,8 @@ module Checker
       end
     end
 
-    Config = Struct.new(:name, :version, :list, :triggers)
-    CheckSet = Struct.new(:category, :checks)
+    Config = Struct.new(:name, :version, :triggers, :list)
+    CheckSet = Struct.new(:category, :checks, :triggers)
     TriggerSet = Struct.new(:paths)
     Check = Struct.new(:check, :triggers)
 
@@ -29,12 +29,12 @@ module Checker
 
     def parse
       @errors = JSON::Validator.fully_validate(Checker::Schema, @yaml)
-      return unless valid?
+      return false unless valid?
       @config = Config.new(
-        name: @yaml["name"],
-        version: @yaml["version"],
-        triggers: parse_trigger_set(@yaml["triggers"]),
-        check_sets: parse_check_sets(@yaml["list"]),
+        @yaml["name"],
+        @yaml["version"],
+        parse_trigger_set(@yaml["triggers"]),
+        parse_check_sets(@yaml["list"]),
       )
     end
 
@@ -42,16 +42,38 @@ module Checker
 
     def parse_trigger_set(trigger_set)
       return TriggerSet.new([]) unless trigger_set
+      TriggerSet.new(
+        Array(trigger_set["paths"]).compact
+      )
     end
 
     def parse_check_sets(check_sets)
       return [] unless check_sets
+      check_sets.map(&method(:parse_check_set))
     end
 
     def parse_check_set(check_set)
+      CheckSet.new(
+        check_set["category"],
+        parse_checks(check_set["checks"]),
+        parse_trigger_set(check_set["triggers"])
+      )
+    end
+
+    def parse_checks(checks)
+      return [] unless checks
+      checks.map(&method(:parse_check))
     end
 
     def parse_check(check)
+      if check.is_a? String
+        Check.new(check)
+      else
+        Check.new(
+          check["check"],
+          parse_trigger_set(check["triggers"])
+        )
+      end
     end
   end
 end

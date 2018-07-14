@@ -1,0 +1,17 @@
+name: Rails MySQL Migration
+version: 1
+triggers:
+  paths: db/migrations/**/*.rb
+list:
+  - category: General
+    checks:
+      - Migrations are reversible
+      - check: Arguments / Input Objects prefer strong types
+        triggers:
+          paths:
+            - argument
+            - input_field
+    triggers:
+      paths:
+        - one_path
+        - another_path
