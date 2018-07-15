@@ -1,0 +1,14 @@
+name: Test On Myself
+version: 1
+triggers:
+  paths: checker/lib/checker/**/*.rb
+list:
+  - I fire for everything
+  - category: General
+    checks:
+      - check: I dont fire at all
+        triggers:
+          paths: gobbledegook.rb
+    triggers:
+      paths:
+        - checker/lib/checker/{c,d}*.rb

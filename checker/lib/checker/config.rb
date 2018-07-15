@@ -54,6 +54,14 @@ module Checker
       @config
     end
 
+    def to_h
+      {
+        path: path,
+        config: config,
+        errors: errors
+      }
+    end
+
     private
 
     def assign_parents
