@@ -2,26 +2,27 @@ defmodule ServerWeb.Router do
   use ServerWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", ServerWeb do
-    pipe_through :browser # Use the default browser stack
+    # Use the default browser stack
+    pipe_through(:browser)
 
-    get "/", PageController, :index
+    resources("check_lists", CheckListController, only: [:index, :show])
   end
 
   scope "/api", ServerWeb do
-    pipe_through :api
+    pipe_through(:api)
 
-    post "/check_lists", Api.CheckListController, :create
+    post("/check_lists", Api.CheckListController, :create)
   end
 end

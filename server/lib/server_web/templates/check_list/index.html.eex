@@ -1,0 +1,9 @@
+<p>
+  Total: <%= length(assigns.check_lists) %>
+</p>
+<%= for check_list <- assigns.check_lists do %>
+  <p>
+    <a href="<%= check_list_path(@conn, :show, check_list.id) %>">ID: <%= check_list.id %></a>
+  </p>
+  <p>ID: <%= inspect check_list.data %></p>
+<% end %>

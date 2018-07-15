@@ -1,0 +1,11 @@
+<h1>
+  <%= assigns.check_list["name"] %>
+</h1>
+<%= for check_list <- assigns.check_list["list"] do %>
+  <h3><%= check_list["category"] %></h3>
+  <ul>
+    <%= for check <- check_list["checks"] do %>
+      <li><%= check["check"] %></li>
+    <% end %>
+  </ul>
+<% end %>
