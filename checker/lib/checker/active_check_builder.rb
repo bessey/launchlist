@@ -11,71 +11,57 @@ module Checker
     # fired for the given diff, and with only the triggers that fired.
     def build
       config.dup.tap do |replacement|
-        puts "FILTERING CONFIG"
-        if replacement.triggers.any?
-          replacement.triggers = process_triggers(replacement.triggers)
-          if !replacement.triggers.any?
-            replacement.list = []
-            return replacement
+        # Process every checklist's checks triggers, removing ones which didn't fire
+        replacement.list.each do |check_list|
+          check_list.checks.each do |check|
+            filter_triggers!(check)
           end
-          replacement.list = filter_check_lists(replacement.list, replacement.triggers)
-        else
-          replacement.list = filter_check_lists(replacement.list)
+          # Process every checklist's checks, removing ones with no triggers
+          filter_untriggered_checks!(check_list)
         end
+        # Process every checklist, removing ones with no fired triggers
+        filter_untriggered_check_lists!(replacement)
+        # Process every checklist, removing ones with no remaining checks
+        filter_checkless_check_lists!(replacement)
       end
     end
 
     private
 
-    def filter_check_lists(list, triggers)
-      list.map(&:dup).map do |check_list|
-        puts "FILTERING CHECK LIST"
-        old_checks = check_list.checks
-        if check_list.triggers.any?
-          check_list.triggers = process_triggers(
-            check_list.triggers,
-            triggers
-          )
-          # Remove check list from result if no triggers fired
-          puts "FILTERING CHECKLIST TRIGGERS"
-          next unless check_list.triggers.any?
-          check_list.checks = filter_checks(old_checks, check_list.triggers, triggers)
-        else
-          check_list.checks = filter_checks(old_checks, check_list.triggers)
-        end
-        check_list
-      end
-    end
-
-    def filter_checks(checks, *triggers)
-      checks.map(&:dup).map do |check|
-        puts "FILTERING CHECK"
-        puts check
-        if check.triggers.any?
-          check.triggers = process_triggers(
-            check.triggers,
-            *triggers
-          )
-          # Remove check from result if no triggers fired
-          next unless check.triggers.any?
-        end
-        check
-      end
-    end
-
-    def process_triggers(*trigger_sets)
-      paths = process_paths(*trigger_sets)
-      Config::TriggerSet.new(paths)
-    end
-
-    def process_paths(*trigger_sets)
-      trigger_sets.inject(differ.modified_paths) do |remaining_paths, set|
-        remaining_paths.select do |path|
-          set.paths.any? do |glob|
-            glob_regex = Glob.new(glob).to_regexp
-            path.match?(glob_regex)
+    def filter_triggers!(check)
+      changed_paths = differ.modified_paths
+      check.flattened_triggers.inject(changed_paths) do |remaining_paths, trigger_set|
+        # Pass through all if no filters
+        next remaining_paths if !trigger_set.paths
+        # Filter the trigger's paths to those which have 1+ matches
+        next_remaining_paths = []
+        trigger_set.paths.each do |glob|
+          glob_regex = Glob.new(glob).to_regexp
+          # Filter the changed paths to those which have 1+ triggers
+          next_remaining_paths += remaining_paths.select do |changed_file|
+            changed_file.match?(glob_regex)
           end
         end
+        trigger_set.paths = next_remaining_paths.sort.uniq
+      end
+    end
+
+    def filter_untriggered_checks!(check_list)
+      check_list.checks = check_list.checks.select do |check|
+        !check.triggers.active? || check.triggers.active? && check.triggers.any?
+      end
+    end
+
+    def filter_untriggered_check_lists!(config)
+      config.list = config.list.select do |check_list|
+        !check_list.triggers.active? ||
+          check_list.triggers.active? && check_list.triggers.any?
+      end
+    end
+
+    def filter_checkless_check_lists!(config)
+      config.list = config.list.reject do |check_list|
+        check_list.checks.length.zero?
       end
     end
   end

@@ -10,6 +10,9 @@ list:
       - check: I fire for only differ
         triggers:
           paths: checker/lib/checker/differ.rb
+      - check: I dont fire at all
+        triggers:
+          paths: gobbledegook.rb
     triggers:
       paths:
         - checker/lib/checker/{c,d}*.rb
