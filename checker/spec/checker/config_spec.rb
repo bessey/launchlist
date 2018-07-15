@@ -42,8 +42,8 @@ RSpec.describe Checker::Config do
       end
       describe "#list" do
         subject { super().list }
-        describe "first check set in list" do
-          subject { super().first }
+        describe "complex check set" do
+          subject { super()[0] }
           describe "#category" do
             subject { super().category }
             it { is_expected.to eq "General" }
@@ -101,6 +101,50 @@ RSpec.describe Checker::Config do
               describe "#parent" do
                 subject { super().parent }
                 it { is_expected.to eq @config.list[0] }
+              end
+            end
+          end
+        end
+        describe "simple check set" do
+          subject { super()[1] }
+          describe "#category" do
+            subject { super().category }
+            it { is_expected.to be_nil }
+          end
+          describe "#parent" do
+            subject { super().parent }
+            it { is_expected.to eq @config.config }
+          end
+          describe "#triggers" do
+            subject { super().triggers }
+            it { is_expected.not_to be nil }
+            describe "#paths" do
+              subject { super().paths }
+              it { is_expected.to be nil }
+            end
+            describe "#active?" do
+              subject { super().active? }
+              it { is_expected.to be false }
+            end
+          end
+          describe "#checks" do
+            subject { super().checks }
+            describe "simple check" do
+              subject { super()[0] }
+              describe "#check" do
+                subject { super().check }
+                it { is_expected.to eq "And simple checks too" }
+              end
+              describe "#parent" do
+                subject { super().parent }
+                it { is_expected.to eq @config.list[1] }
+              end
+              describe "#triggers" do
+                subject { super().triggers }
+                describe "#active?" do
+                  subject { super().active? }
+                  it { is_expected.to be false }
+                end
               end
             end
           end

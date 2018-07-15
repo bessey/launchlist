@@ -1,4 +1,5 @@
 require "yaml"
+require "checker/config/structures"
 
 module Checker
   class Config
@@ -12,63 +13,10 @@ module Checker
     end
     extend Forwardable
 
-    module Triggerable
-      def dup
-        super().tap do |me|
-          me.triggers = me.triggers.dup
-        end
-      end
-    end
-
-    module Parentable
-      attr_accessor :parent
-      def flattened_triggers
-        [*parent.flattened_triggers, triggers]
-      end
-    end
-
-    module NestedCheckable
-      def dup
-        super().tap do |me|
-          me.children = me.children.map(&:dup)
-        end
-      end
-    end
-
-    Config = Struct.new(:name, :version, :triggers, :list) do
-      include Triggerable
-      include NestedCheckable
-      def children
-        list
-      end
-      def flattened_triggers
-        [triggers]
-      end
-    end
-    CheckSet = Struct.new(:category, :checks, :triggers) do
-      include Parentable
-      include Triggerable
-      include NestedCheckable
-      def children
-        checks
-      end
-    end
-    Check = Struct.new(:check, :triggers) do
-      include Parentable
-      include Triggerable
-    end
-    TriggerSet = Struct.new(:paths) do
-      def active?
-        !!paths
-      end
-      def any?
-        paths.length > 0
-      end
-    end
     NotParsedError = Class.new(StandardError)
 
     attr_reader :path, :yaml, :errors
-    def_delegators(:config, *Config.members)
+    def_delegators(:config, *Root.members)
 
     def initialize(path)
       @path = path
@@ -89,7 +37,7 @@ module Checker
     def parse
       @errors = JSON::Validator.fully_validate(Checker::Schema, @yaml)
       return false unless valid?
-      @config = Config.new(
+      @config = Root.new(
         @yaml["name"],
         @yaml["version"],
         parse_trigger_set(@yaml["triggers"]),
@@ -133,11 +81,19 @@ module Checker
     end
 
     def parse_check_set(check_set)
-      CheckSet.new(
-        check_set["category"],
-        parse_checks(check_set["checks"]),
-        parse_trigger_set(check_set["triggers"])
-      )
+      if check_set.is_a?(String)
+        CheckSet.new(
+          nil,
+          parse_checks([check_set]),
+          parse_trigger_set(nil)
+        )
+      else
+        CheckSet.new(
+          check_set["category"],
+          parse_checks(check_set["checks"]),
+          parse_trigger_set(check_set["triggers"])
+        )
+      end
     end
 
     def parse_checks(checks)
