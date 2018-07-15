@@ -48,6 +48,10 @@ RSpec.describe Checker::Config do
             subject { super().category }
             it { is_expected.to eq "General" }
           end
+          describe "#parent" do
+            subject { super().parent }
+            it { is_expected.to eq @config.config }
+          end
           describe "#triggers" do
             subject { super().triggers }
             it { is_expected.not_to be_nil }
@@ -64,6 +68,10 @@ RSpec.describe Checker::Config do
                 subject { super().check }
                 it { is_expected.to eq "Migrations are reversible" }
               end
+              describe "#parent" do
+                subject { super().parent }
+                it { is_expected.to eq @config.list[0] }
+              end
             end
             describe "complex check" do
               subject { super()[1] }
@@ -78,6 +86,10 @@ RSpec.describe Checker::Config do
                   subject { super().paths }
                   it { is_expected.to contain_exactly("argument", "input_field") }
                 end
+              end
+              describe "#parent" do
+                subject { super().parent }
+                it { is_expected.to eq @config.list[0] }
               end
             end
           end
