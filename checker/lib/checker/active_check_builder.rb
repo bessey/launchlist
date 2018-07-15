@@ -2,8 +2,8 @@ module Checker
   class ActiveCheckBuilder
     attr_reader :config, :differ
 
-    def initialize(config, differ)
-      @config = config
+    def initialize(root, differ)
+      @config = root
       @differ = differ
     end
 
