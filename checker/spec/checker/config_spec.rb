@@ -72,6 +72,13 @@ RSpec.describe Checker::Config do
                 subject { super().parent }
                 it { is_expected.to eq @config.list[0] }
               end
+              describe "#triggers" do
+                subject { super().triggers }
+                describe "#active?" do
+                  subject { super().active? }
+                  it { is_expected.to be false }
+                end
+              end
             end
             describe "complex check" do
               subject { super()[1] }
@@ -85,6 +92,10 @@ RSpec.describe Checker::Config do
                 describe "#paths" do
                   subject { super().paths }
                   it { is_expected.to contain_exactly("argument", "input_field") }
+                end
+                describe "#active?" do
+                  subject { super().active? }
+                  it { is_expected.to be true }
                 end
               end
               describe "#parent" do

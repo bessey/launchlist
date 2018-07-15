@@ -12,14 +12,55 @@ module Checker
     end
     extend Forwardable
 
-    Config = Struct.new(:name, :version, :triggers, :list)
-    CheckSet = Struct.new(:category, :checks, :triggers) do
+    module Triggerable
+      def dup
+        super().tap do |me|
+          me.triggers = me.triggers.dup
+        end
+      end
+    end
+
+    module Parentable
       attr_accessor :parent
+      def flattened_triggers
+        [*parent.flattened_triggers, triggers]
+      end
+    end
+
+    module NestedCheckable
+      def dup
+        super().tap do |me|
+          me.children = me.children.map(&:dup)
+        end
+      end
+    end
+
+    Config = Struct.new(:name, :version, :triggers, :list) do
+      include Triggerable
+      include NestedCheckable
+      def children
+        list
+      end
+      def flattened_triggers
+        [triggers]
+      end
+    end
+    CheckSet = Struct.new(:category, :checks, :triggers) do
+      include Parentable
+      include Triggerable
+      include NestedCheckable
+      def children
+        checks
+      end
     end
     Check = Struct.new(:check, :triggers) do
-      attr_accessor :parent
+      include Parentable
+      include Triggerable
     end
     TriggerSet = Struct.new(:paths) do
+      def active?
+        !!paths
+      end
       def any?
         paths.length > 0
       end
@@ -76,11 +117,14 @@ module Checker
       end
     end
 
+    # To ensure we can tell the difference during active check build between a
+    # trigger set that has had its triggers filtered, and one which was empty
+    # from the start, we initialize TriggerSet to nil for the latter.
     def parse_trigger_set(trigger_set)
-      return TriggerSet.new(Set.new) unless trigger_set
-      TriggerSet.new(
-        Set.new(Array(trigger_set["paths"]).compact)
-      )
+      return TriggerSet.new unless trigger_set
+      paths = Array(trigger_set["paths"]).compact
+      return TriggerSet.new unless paths
+      TriggerSet.new(Set.new(paths))
     end
 
     def parse_check_sets(check_sets)
