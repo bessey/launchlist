@@ -1,0 +1,15 @@
+name: Test On Myself
+version: 1
+triggers:
+  paths: checker/lib/checker/**/*.rb
+list:
+  - I fire for everything
+  - category: General
+    checks:
+      - I fire for config and differ
+      - check: I fire for only differ
+        triggers:
+          paths: checker/lib/checker/differ.rb
+    triggers:
+      paths:
+        - checker/lib/checker/{c,d}*.rb
