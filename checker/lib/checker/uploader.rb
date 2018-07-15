@@ -8,7 +8,8 @@ module Checker
     end
 
     def upload
-      response = HTTP.post(endpoint, json: serialize_value(@results))
+      response = HTTP.timeout(:per_operation, write: 10, connect: 10, read: 10)
+        .post(endpoint, json: serialize_value(@results))
       case response.code
       when 200, 201
         puts "Upload successful!"
