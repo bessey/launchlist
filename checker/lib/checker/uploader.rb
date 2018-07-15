@@ -2,21 +2,22 @@ require "http"
 
 module Checker
   class Uploader
+    include Logging
     DEFAULT_ENDPOINT = 'https://checklint.com/api/check_lists'
     def initialize(results)
       @results = results
     end
 
     def upload
+      logger.info "Beginning upload of results..."
       response = HTTP.timeout(:per_operation, write: 10, connect: 10, read: 10)
         .post(endpoint, json: serialize_value(@results))
       case response.code
       when 200, 201
-        puts "Upload successful!"
+        logger.info "Upload successful!"
         true
       else
-        puts "Error Uploading: HTTP Status #{response.code}"
-        puts response.body.to_s
+        logger.error "Error Uploading: HTTP Status #{response.code}\n#{response.body}"
         false
       end
     end
