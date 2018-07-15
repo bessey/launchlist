@@ -1,13 +1,15 @@
 defmodule Server.CheckList do
   use Ecto.Schema
   import Ecto.Changeset
+  import EctoEnum, except: [cast: 3]
 
+  defenum(StatusEnum, new: 1, in_progress: 2, complete: 3)
 
   schema "check_lists" do
-    field :data, :map
-    field :head_sha, :string
-    field :status, :integer
-    field :pull_request_id, :id
+    field(:data, :map)
+    field(:head_sha, :string)
+    field(:status, StatusEnum)
+    field(:pull_request_id, :id)
 
     timestamps()
   end

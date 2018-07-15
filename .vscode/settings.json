@@ -1,3 +1,4 @@
 {
-  "elixir.projectPath": "server"
+  "elixirLS.projectDir": "server",
+  "editor.formatOnSave": true
 }
