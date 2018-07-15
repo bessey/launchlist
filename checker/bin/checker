@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require("checker")
+
+Checker::CLI.start(ARGV)
