@@ -4,7 +4,14 @@ defmodule ServerWeb.PullRequestController do
   import Ecto.Query
 
   def index(conn, _params) do
-    pull_requests = Repo.all(from(p in PullRequest, select: %{ id: p.id }))
+    pull_requests =
+      Repo.all(
+        from(
+          p in PullRequest,
+          preload: [:working_lists]
+        )
+      )
+
     render(conn, "index.html", pull_requests: pull_requests)
   end
 end

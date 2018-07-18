@@ -6,8 +6,6 @@ defmodule ServerWeb.Api.WorkingListController do
   def create(conn, %{"data" => data}) do
     results = CheckResult.from_result_set(data)
 
-    # TODO actually get this myself
-
     Enum.map(results, fn result ->
       Map.from_struct(result)
       |> insert_result_into_repo()

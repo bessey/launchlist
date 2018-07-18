@@ -14,7 +14,7 @@ defmodule Server.WorkingList do
     field(:data, :map)
     field(:head_sha, :string)
     field(:status, StatusEnum)
-    field(:pull_request_id, :id)
+    belongs_to(:pull_request, Server.PullRequest)
 
     timestamps()
   end

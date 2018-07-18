@@ -3,4 +3,5 @@
 </p>
 <%= for pull_request <- assigns.pull_requests do %>
   <p>ID: <%= pull_request.id %></p>
+  <p>Latest SHA: <%= latest_sha(List.first(pull_request.working_lists)) %></p>
 <% end %>

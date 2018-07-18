@@ -5,6 +5,7 @@ defmodule Server.PullRequest do
 
   schema "pull_requests" do
     field :pull_request_id, :integer
+    has_many :working_lists, Server.WorkingList
 
     timestamps()
   end
