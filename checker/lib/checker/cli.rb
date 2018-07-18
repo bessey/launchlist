@@ -24,9 +24,12 @@ module Checker
           verbose: options[:verbose]
         )
         exit(0)
-      else
-        exit(-1)
       end
+    rescue Checker::Differ::MissingSHAError => e
+      puts "Did not recognise either --to or --from. Ensure you used a full git SHA (not shortened), branch, or HEAD"
+    ensure
+      # If we got here, we definitely didn't succeed
+      exit(-1)
     end
   end
 end
