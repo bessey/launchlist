@@ -85,16 +85,12 @@ module Checker
 
     def parse_check_sets(check_sets)
       return [] unless check_sets
-      check_sets.map(&method(:parse_check_set))
+      check_sets.map(&method(:parse_check_set)).uniq
     end
 
     def parse_check_set(check_set)
       if check_set.is_a?(String)
-        CheckSet.new(
-          nil,
-          parse_checks([check_set]),
-          parse_trigger_set(nil)
-        )
+        add_to_general_check_set(check_set)
       else
         CheckSet.new(
           check_set["category"],
@@ -117,6 +113,13 @@ module Checker
           check["check"],
           parse_trigger_set(check["triggers"])
         )
+      end
+    end
+
+    def add_to_general_check_set(check_string)
+      @general_check_set ||= CheckSet.new(nil, [], parse_trigger_set(nil))
+      @general_check_set.tap do |check_set|
+        check_set.checks << parse_check(check_string)
       end
     end
   end
