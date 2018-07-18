@@ -13,6 +13,11 @@ module Checker
       def flattened_triggers
         [*parent.flattened_triggers, triggers]
       end
+
+      # If a check fires, only the deepest trigger set is responsible for it
+      def effective_trigger_set
+        flattened_triggers.last
+      end
     end
 
     module NestedCheckable

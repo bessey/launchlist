@@ -4,6 +4,7 @@ require "checker/logging"
 require "checker/active_check_builder"
 require "checker/cli"
 require "checker/config"
+require "checker/debug"
 require "checker/differ"
 require "checker/glob"
 require "checker/result_set"
@@ -15,7 +16,7 @@ require "checker/version"
 module Checker
   extend self
 
-  def run(from, to, token:, lists:, skip_upload: false)
-    Runner.new.run(from, to, token: token, lists: lists, skip_upload: skip_upload)
+  def run(from, to, token:, lists:, skip_upload: false, verbose: false)
+    Runner.new.run(from, to, token: token, lists: lists, skip_upload: skip_upload, verbose: verbose)
   end
 end

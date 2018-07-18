@@ -8,6 +8,7 @@ module Checker
     option :to, default: "HEAD", type: :string, desc: "The head commit / reference with which to compare"
     option :lists, default: ".checklists/**/*.{yaml,yml}", desc: "The path glob used to find all checklists"
     option :skip_upload, default: false, type: :boolean
+    option :verbose, default: false, type: :boolean, desc: "Print out the results, useful for previewing"
     long_desc <<~LONGDESC
       `checker run --token TOKEN` will calculate the diff between (by default) the current branch
       HEAD and master HEAD, record which YAML check lists items apply to this diff, and upload
@@ -19,11 +20,12 @@ module Checker
           options[:to],
           lists: options[:lists],
           token: options[:token],
-          skip_upload: options[:skip_upload]
+          skip_upload: options[:skip_upload],
+          verbose: options[:verbose]
         )
-        exit 0
+        exit(0)
       else
-        exit -1
+        exit(-1)
       end
     end
   end

@@ -3,13 +3,14 @@ module Checker
     include Logging
     # Main checker API
     # Returns true if sucessfull, false otherwise
-    def run(from, to, token:, lists:, skip_upload: false)
+    def run(from, to, token:, lists:, skip_upload: false, verbose: false)
       checklist_files = Dir.glob(lists)
       logger.info "Found #{checklist_files.length} lists in #{lists}"
       configs = parse_configs(checklist_files)
       return false unless configs
       outputs = build_results(from, to, configs)
       result_set = ResultSet.new(token, 1, outputs)
+      result_set.print_debug_info if verbose
       upload(result_set, skip_upload)
     end
 
