@@ -17,12 +17,14 @@ defmodule ServerWeb.Router do
     # Use the default browser stack
     pipe_through(:browser)
 
-    resources("check_lists", CheckListController, only: [:index, :show])
+    resources("pull_requests", PullRequestController, only: [:index]) do
+      resources("working_list_sets", WorkingListSetController, only: [:show])
+    end
   end
 
   scope "/api", ServerWeb do
     pipe_through(:api)
 
-    post("/check_lists", Api.CheckListController, :create)
+    post("/working_lists", Api.WorkingListController, :create)
   end
 end

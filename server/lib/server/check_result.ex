@@ -22,12 +22,16 @@ defmodule Server.CheckResult do
   @doc """
     Convert untyped map to nested structs
   """
-  def from_map(data) do
+  def from_result_set(data) do
+    Enum.map(data, &parse_single_result/1)
+  end
+
+  def parse_single_result(result) do
     struct!(Root, %{
-      name: data["name"],
-      version: data["version"],
-      triggers: parse_trigger_set(data["triggers"]),
-      list: Enum.map(data["list"], &parse_check_set/1)
+      name: result["name"],
+      version: result["version"],
+      triggers: parse_trigger_set(result["triggers"]),
+      list: Enum.map(result["list"], &parse_check_set/1)
     })
   end
 

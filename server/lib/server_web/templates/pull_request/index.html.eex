@@ -1,0 +1,6 @@
+<p>
+  Total: <%= length(assigns.pull_requests) %>
+</p>
+<%= for pull_request <- assigns.pull_requests do %>
+  <p>ID: <%= pull_request.id %></p>
+<% end %>
