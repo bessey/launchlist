@@ -1,0 +1,20 @@
+name: Rails
+version: 1
+list:
+  - category: Controllers
+    checks:
+      - Actions can only be accessed by a user with the appropriate authorization
+      - Record fetches within actions are scoped to a user's authorization level
+    triggers:
+      paths: app/controllers/**/*.rb
+  - category: Models
+    checks:
+      - Strict validation is used where possible, preventing bad data from entering the database and breaking consumers
+      - Parent and child relationships are configured to destroy / delete / nullify as appropriate, to avoid orphan data
+    triggers:
+      paths: app/models/**/*.rb
+  - category: Jobs
+    checks:
+      - Job queues are set to reflect the actual priority of the jobs
+    triggers:
+      paths: app/jobs/**/*.rb

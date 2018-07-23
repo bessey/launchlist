@@ -12,22 +12,28 @@ list:
   - category: Performance
     checks:
       - Fields that access the DB make use of Loaders to avoid N+1 queries
-  - category: New APIs
+  - category: New Arguments
     checks:
       - check: Arguments / Input Objects prefer strong types such as Enums over Strings
         triggers:
           additions_include:
             - argument
             - input_field
-      - check: Fields are authorized with appropriate permissions
-        triggers:
-          additions_include:
-            - /field :\w+/
-      - check: Field names are clear, unambiguous, and unlikely to conflict with future fields
-        triggers:
-          additions_include:
-            - /field :\w+/
-      - check: APIs are friendly to the consumer, not necessarily 1:1 with database records
-        triggers:
-          additions_include:
-            - /field :\w+/
+  - category: New Query APIs
+    checks:
+      - APIs are friendly to the consumer, mapping data to how it will be _used_, not necessarily 1:1 with database records
+      - Fields are authorized such that only the appropriate users can access them
+      - List fields / connections are scoped so that users can only see the data they have access to
+      - Field names are clear, verbosity to acronyms (since the client can alias them as needed)
+      - Field names are unambiguous, unlikely to conflict with future fields, because they avoid singular common words and homonyms
+    triggers:
+      additions_include:
+        - /field :\w+/
+  - category: New Mutation APIs
+    triggers:
+      paths:
+        - /app/graphql/mutation_type.rb
+      additions_include:
+        - /field :\w+/
+    checks:
+      - Field names are of the format "mutatedObjectVerb", e.g. "userCreate", not the more intuitive "createUser" to ensure alphabetical API locality
