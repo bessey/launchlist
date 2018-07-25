@@ -3,10 +3,12 @@ defmodule Server.Repo.Migrations.CreateUsers do
 
   def change do
     create table(:users) do
-      add :email, :string
+      add(:email, :string)
+      add(:access_token, :string)
+      add(:github_id, :integer)
+      add(:github_username, :string)
 
       timestamps()
     end
-
   end
 end
