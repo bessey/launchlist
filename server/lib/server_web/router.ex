@@ -17,6 +17,8 @@ defmodule ServerWeb.Router do
     # Use the default browser stack
     pipe_through(:browser)
 
+    get("/", HomeController, :index)
+
     resources("/pull_requests", PullRequestController, only: [:index]) do
       resources("/working_list_sets", WorkingListSetController, only: [:show])
     end
