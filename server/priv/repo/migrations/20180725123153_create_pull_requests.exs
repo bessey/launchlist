@@ -3,12 +3,12 @@ defmodule Server.Repo.Migrations.CreatePullRequests do
 
   def change do
     create table(:pull_requests) do
-      add :pull_request_id, :integer
-      add :owner, :string
-      add :repo, :string
+      add :github_id, :integer
+      add :repository_id, references(:repositories, on_delete: :nothing)
 
       timestamps()
     end
 
+    create index(:pull_requests, [:repository_id])
   end
 end
