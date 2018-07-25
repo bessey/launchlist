@@ -62,19 +62,15 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
   defp check_suite_requested(payload) do
     Logger.info("Check Suite Requested")
 
-    Enum.map(payload["check_suite"]["pull_requests"], fn pr ->
-      %{
-        repository: %{
-          github_id: pr["owner"]["id"]
-        },
-        pull_request: %{
-          github_id: pr["id"],
-          head_sha: payload["check_suit"]["head_sha"]
-        }
-      }
+    Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
+      create_check_run(pr["id"], payload["check_suit"]["head_sha"])
     end)
-    |> Enum.each(&GitHub.upsert_check_run_from_github/1)
 
     %{status: :accepted}
+  end
+
+  defp create_check_run(pull_request_id, head_sha) do
+    GitHub.upsert_check_run_from_github!(pull_request_id, %{head_sha: head_sha})
+    |> GitHub.send_pending_check_run()
   end
 end

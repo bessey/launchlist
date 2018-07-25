@@ -5,6 +5,7 @@ defmodule Server.GitHub.PullRequest do
   schema "pull_requests" do
     field(:github_id, :integer)
     belongs_to(:repository, Server.GitHub.Repository)
+    has_many(:check_runs, Server.GitHub.CheckRun)
 
     timestamps()
   end
