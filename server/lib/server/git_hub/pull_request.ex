@@ -4,7 +4,7 @@ defmodule Server.GitHub.PullRequest do
 
   schema "pull_requests" do
     field(:github_id, :integer)
-    field(:repository_id, :id)
+    belongs_to(:repository, Server.GitHub.Repository)
 
     timestamps()
   end

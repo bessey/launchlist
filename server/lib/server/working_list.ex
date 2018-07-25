@@ -14,7 +14,7 @@ defmodule Server.WorkingList do
     field(:data, :map)
     field(:head_sha, :string)
     field(:status, StatusEnum)
-    belongs_to(:pull_request, Server.PullRequest)
+    belongs_to(:pull_request, Server.GitHub.PullRequest)
 
     timestamps()
   end

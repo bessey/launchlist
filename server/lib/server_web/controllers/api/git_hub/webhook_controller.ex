@@ -6,39 +6,61 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
   plug(GitHubWebhookHeaders)
 
   def create(%{assigns: %{github_event: event}} = conn, payload) do
-    status =
-      case event do
-        "installation" ->
-          Logger.info("Hey someone installed it")
-          :ok
-
-        "installation_repositories" ->
-          repo_install_event(payload)
-
-        _ ->
-          Logger.debug("Unhandled Event #{event}")
-          :ok
-      end
-
-    json(conn, %{status: status})
+    Logger.debug("Processing Event: '#{event}'")
+    response = process_event(event, payload)
+    json(conn, response)
   end
 
-  defp repo_install_event(%{"action" => "added"} = payload) do
+  defp process_event("check_suite", %{"action" => "requested"} = payload),
+    do: check_suite_requested(payload)
+
+  defp process_event("check_suite", %{"action" => "rerequested"} = payload),
+    do: check_suite_requested(payload)
+
+  defp process_event("installation", _) do
+    Logger.info("Hey someone installed it")
+    %{status: :ok}
+  end
+
+  defp process_event("installation_repositories", %{"action" => "added"} = payload) do
     Logger.info("Adding #{length(payload["repositories_added"])} Repos")
 
     Enum.each(payload["repositories_added"], fn repo ->
-      GitHub.create_repository(%{name: repo["name"], github_id: repo["id"]})
+      GitHub.upsert_repo_from_github(repo["id"], %{name: repo["name"]})
     end)
 
-    :created
+    %{status: :created}
   end
 
-  defp repo_install_event(%{"action" => "removed"} = payload) do
+  defp process_event("installation_repositories", %{"action" => "removed"} = payload) do
     Logger.info("Deleting #{length(payload["repositories_removed"])} Repos")
 
     Enum.map(payload["repositories_removed"], fn repo -> repo["id"] end)
-    |> GitHub.delete_repositories()
+    |> GitHub.delete_repositories_from_github()
 
-    :accepted
+    %{status: :accepted}
+  end
+
+  defp process_event("pull_request", %{"action" => "opened"} = payload) do
+    repository_attrs = %{name: payload["repository"]["name"]}
+
+    with {:ok, repo} <-
+           GitHub.upsert_repo_from_github(payload["repository"]["id"], repository_attrs),
+         {:ok, _} <-
+           GitHub.upsert_pull_request_from_github(payload["number"], %{repository_id: repo.id}) do
+      %{status: :created}
+    else
+      error -> %{status: :error, error: inspect(error)}
+    end
+  end
+
+  defp process_event(event, _) do
+    Logger.debug("Unhandled Event #{event}")
+    %{status: :ok}
+  end
+
+  defp check_suite_requested(_) do
+    Logger.info("Check Suite Requested")
+    %{status: :accepted}
   end
 end

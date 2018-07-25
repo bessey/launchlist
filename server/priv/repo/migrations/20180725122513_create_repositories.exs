@@ -3,11 +3,14 @@ defmodule Server.Repo.Migrations.CreateRepositories do
 
   def change do
     create table(:repositories) do
-      add(:auth_token, :string)
-      add(:name, :string)
-      add(:github_id, :integer)
+      add(:auth_token, :string, null: false)
+      add(:name, :string, null: false)
+      add(:github_id, :integer, null: false)
 
       timestamps()
     end
+
+    create(index(:repositories, [:auth_token], unique: true))
+    create(index(:repositories, [:github_id], unique: true))
   end
 end

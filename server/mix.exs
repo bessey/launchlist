@@ -43,7 +43,8 @@ defmodule Server.Mixfile do
       {:cowboy, "~> 1.0"},
       {:ecto_enum, "~> 1.0"},
       {:ueberauth, "~> 0.4"},
-      {:ueberauth_github, "~> 0.7"}
+      {:ueberauth_github, "~> 0.7"},
+      {:secure_random, "~> 0.5"}
     ]
   end
 
