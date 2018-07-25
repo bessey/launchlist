@@ -29,7 +29,8 @@ config :ueberauth, Ueberauth,
 config :server, ServerWeb.Endpoint,
   secret_key_base: "fOoXXylTp8Ct+JpO0wHl8oQ0nqljgB6b7hqB0ILHAf0KkaMmFjWCzH+r4noXYxD6",
   github_oauth_client_id: System.get_env("GITHUB_OAUTH_ID"),
-  github_oauth_client_secret: System.get_env("GITHUB_OAUTH_SECRET")
+  github_oauth_client_secret: System.get_env("GITHUB_OAUTH_SECRET"),
+  github_webhook_secret: "vHI7xJU8HJyjxlEB/dbeVEsMI58IdgLA1+cXrqFODnq1QKirtnhndJxVjG9Ji4tI"
 
 config :ueberauth, Ueberauth.Strategy.Github.OAuth,
   client_id: System.get_env("GITHUB_OAUTH_ID"),

@@ -32,9 +32,13 @@ defmodule ServerWeb.Router do
     delete("/logout", AuthController, :delete)
   end
 
-  scope "/api", ServerWeb do
+  scope "/api", ServerWeb.Api do
     pipe_through(:api)
 
-    post("/working_lists", Api.WorkingListController, :create)
+    post("/working_lists", WorkingListController, :create)
+
+    scope "/github", GitHub do
+      post("/webhooks", WebhookController, :create)
+    end
   end
 end
