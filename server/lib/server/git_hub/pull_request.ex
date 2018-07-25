@@ -12,7 +12,7 @@ defmodule Server.GitHub.PullRequest do
   @doc false
   def changeset(pull_request, attrs) do
     pull_request
-    |> cast(attrs, [:github_id, :repository_id])
+    |> cast(attrs, [:github_id])
     |> validate_required([:github_id, :repository_id])
   end
 end

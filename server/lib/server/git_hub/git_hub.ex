@@ -1,6 +1,5 @@
 defmodule Server.GitHub do
-  alias Server.GitHub.Repository
-  alias Server.GitHub.PullRequest
+  alias Server.GitHub.{Repository, PullRequest, CheckRun}
   alias Server.Repo
 
   def delete_repositories_from_github(github_ids) do
@@ -23,6 +22,18 @@ defmodule Server.GitHub do
     case Repo.get_by(PullRequest, github_id: pr_github_id) do
       nil ->
         %PullRequest{github_id: pr_github_id}
+
+      repo ->
+        repo
+    end
+    |> PullRequest.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+  def upsert_check_run_from_github(%{repository: repository, pull_request: pull_request}) do
+    case Repo.get_check_run_from_github_ids(repository.github_id, pull_request.github_id) do
+      nil ->
+        %CheckRun{id: pull_request.github_id}
 
       repo ->
         repo

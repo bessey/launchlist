@@ -1,0 +1,19 @@
+defmodule Server.GitHub.CheckRun do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "check_runs" do
+    field(:head_sha, :string)
+    belongs_to(:pull_request, Server.GitHub.PullRequest)
+    has_one(:check_result_set, Server.Checker.CheckResultSet)
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(check_run, attrs) do
+    check_run
+    |> cast(attrs, [:head_sha])
+    |> validate_required([:head_sha, :pull_request_id])
+  end
+end
