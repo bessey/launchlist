@@ -1,3 +1,8 @@
-<a href="<%= auth_path(@conn, :request, "github") %>">
-  Login with GitHub
-</a>
+<%= if @current_user do %>
+  <p>
+    Welcome back, <%= @current_user.email %>
+  </p>
+  <%= link("Logout", to: auth_path(@conn, :delete), method: :delete) %>
+<% else %>
+  <%= link("Login with GitHub", to: auth_path(@conn, :request, "github")) %>
+<% end %>

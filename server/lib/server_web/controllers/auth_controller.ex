@@ -4,12 +4,7 @@ defmodule ServerWeb.AuthController do
   """
   use ServerWeb, :controller
 
-  alias Ueberauth.Strategy.Helpers
   plug(Ueberauth)
-
-  def request(conn, _params) do
-    render(conn, "request.html", callback_url: Helpers.callback_url(conn))
-  end
 
   def delete(conn, _params) do
     conn

@@ -29,6 +29,7 @@ defmodule ServerWeb.Router do
 
     get("/:provider", AuthController, :request)
     get("/:provider/callback", AuthController, :callback)
+    delete("/logout", AuthController, :delete)
   end
 
   scope "/api", ServerWeb do
