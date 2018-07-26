@@ -1,5 +1,5 @@
 defmodule Server.GitHub do
-  alias Server.GitHub.{Repository, PullRequest, CheckRun}
+  alias Server.GitHub.{Repository, PullRequest, CheckRun, ApiClient}
   alias Server.Repo
 
   def delete_repositories_from_github(github_ids) do
@@ -40,5 +40,14 @@ defmodule Server.GitHub do
       |> CheckRun.changeset(attrs)
       |> Repo.insert_or_update!()
     end
+  end
+
+  def send_pending_check_run(%CheckRun{} = check_run) do
+    ApiClient.send_pending_check_run(%{
+      head_sha: check_run.head_sha,
+      external_id: check_run.id,
+      status: "queued",
+      started_at: check_run.inserted_at
+    })
   end
 end

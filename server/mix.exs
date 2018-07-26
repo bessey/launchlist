@@ -45,6 +45,8 @@ defmodule Server.Mixfile do
       {:ueberauth, "~> 0.4"},
       {:ueberauth_github, "~> 0.7"},
       {:secure_random, "~> 0.5"},
+      {:tesla, "~> 1.0.0"},
+      {:jason, ">= 1.0.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:dialyxir, "~> 1.0.0-rc.3", only: [:dev], runtime: false}
     ]

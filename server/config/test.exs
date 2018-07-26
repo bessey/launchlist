@@ -17,3 +17,10 @@ config :server, Server.Repo,
   database: "server_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :server,
+  github_oauth_client_id: "1234",
+  github_oauth_client_secret: "abcd",
+  github_webhook_secret: "beefcafe"
+
+config :tesla, adapter: Tesla.Mock
