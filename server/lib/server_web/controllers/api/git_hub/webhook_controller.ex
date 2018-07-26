@@ -1,7 +1,7 @@
 defmodule ServerWeb.Api.GitHub.WebhookController do
   use ServerWeb, :controller
   require Logger
-  alias Server.GitHub
+  alias Server.{GitHub, Checker}
 
   plug(GitHubWebhookHeaders)
 
@@ -45,14 +45,13 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
   end
 
   defp process_event("pull_request", %{"action" => "opened"} = payload) do
-    repository_attrs = %{name: payload["repository"]["name"]}
+    repo_github_id = Map.fetch!(payload["repository"], "id")
+    pr_github_id = Map.fetch!(payload["pull_request"], "id")
 
-    with {:ok, repo} <-
-           GitHub.upsert_repo_from_github(payload["repository"]["id"], repository_attrs),
-         {:ok, _} <-
-           GitHub.upsert_pull_request_from_github(payload["pull_request"]["id"], %{
-             repository_id: repo.id
-           }) do
+    with repo_attrs <- %{name: payload["repository"]["name"]},
+         {:ok, repo} <- GitHub.upsert_repo_from_github(repo_github_id, repo_attrs),
+         pr_attrs <- %{repository_id: repo.id},
+         {:ok, _} <- GitHub.upsert_pull_request_from_github(pr_github_id, pr_attrs) do
       %{status: :created}
     else
       error -> %{status: :bad_request, error: inspect(error)}
@@ -64,15 +63,23 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     %{status: :ok}
   end
 
-  defp check_suite_requested(payload) do
-    Logger.info("Check Suite Requested")
-
+  defp check_suite_requested(%{} = payload) do
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
-      GitHub.send_queued_check_run(
-        Map.fetch!(pr, "id"),
-        Map.fetch!(payload["check_suite"], "head_sha"),
-        Map.fetch!(payload["repository"]["owner"], "login")
-      )
+      owner_name = Map.fetch!(payload["repository"]["owner"], "login")
+
+      {pull_request, check_run} =
+        GitHub.upsert_check_run_from_github!(
+          Map.fetch!(pr, "id"),
+          %{head_sha: Map.fetch!(payload["check_suite"], "head_sha")}
+        )
+
+      check_result_set =
+        check_run
+        |> Ecto.build_assoc(:check_result_set)
+        |> Map.from_struct()
+        |> Checker.create_check_result_set()
+
+      GitHub.send_queued_check_run(owner_name, pull_request, check_run, check_result_set)
     end)
 
     %{status: :accepted}

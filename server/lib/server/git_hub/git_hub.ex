@@ -8,7 +8,7 @@ defmodule Server.GitHub do
     Repo.delete_repositories(github_ids)
   end
 
-  def upsert_repo_from_github(repo_github_id, attrs) do
+  def upsert_repo_from_github(repo_github_id, %{} = attrs) do
     case Repo.get_by(Repository, github_id: repo_github_id) do
       nil -> %Repository{github_id: repo_github_id}
       repo -> repo
@@ -17,7 +17,7 @@ defmodule Server.GitHub do
     |> Repo.insert_or_update()
   end
 
-  def upsert_pull_request_from_github(pr_github_id, attrs) do
+  def upsert_pull_request_from_github(pr_github_id, %{} = attrs) do
     case Repo.get_by(PullRequest, github_id: pr_github_id) do
       nil -> %PullRequest{}
       pull_request -> pull_request
@@ -26,32 +26,8 @@ defmodule Server.GitHub do
     |> Repo.insert_or_update()
   end
 
-  def send_queued_check_run(pr_github_id, head_sha, owner_name) do
-    {pull_request, check_run} = upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha})
-
-    repo_name =
-      from(
-        r in Repository,
-        join: p in assoc(r, :pull_requests),
-        select: r.name,
-        where: p.id == ^pull_request.id
-      )
-      |> Server.Repo.one()
-
-    ApiClient.send_check_run(
-      owner_name,
-      repo_name,
-      %{
-        head_sha: check_run.head_sha,
-        external_id: check_run.id,
-        status: "queued",
-        started_at: check_run.inserted_at
-      }
-    )
-  end
-
-  @spec upsert_check_run_from_github!(integer, map) :: CheckRun | {PullRequest, CheckRun}
-  defp upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha} = attrs) do
+  @spec upsert_check_run_from_github!(integer, map) :: {%PullRequest{}, %CheckRun{}}
+  def upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha} = attrs) do
     pull_request =
       from(
         p in PullRequest,
@@ -81,5 +57,30 @@ defmodule Server.GitHub do
       end
 
     {pull_request, check_run}
+  end
+
+  ### API CLIENT
+
+  @spec send_queued_check_run(String.t(), %PullRequest{}, %CheckRun{}, map) :: any
+  def send_queued_check_run(owner_name, pull_request, check_run, %{id: external_id}) do
+    repo_name =
+      from(
+        r in Repository,
+        join: p in assoc(r, :pull_requests),
+        select: r.name,
+        where: p.id == ^pull_request.id
+      )
+      |> Server.Repo.one()
+
+    ApiClient.send_check_run(
+      owner_name,
+      repo_name,
+      %{
+        head_sha: check_run.head_sha,
+        external_id: external_id,
+        status: "queued",
+        started_at: check_run.inserted_at
+      }
+    )
   end
 end
