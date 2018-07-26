@@ -63,14 +63,13 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     Logger.info("Check Suite Requested")
 
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
-      create_check_run(pr["id"], payload["check_suit"]["head_sha"])
+      GitHub.send_queued_check_run(
+        pr["id"],
+        payload["check_suit"]["head_sha"],
+        payload["repository"]["owner"]["login"]
+      )
     end)
 
     %{status: :accepted}
-  end
-
-  defp create_check_run(pull_request_id, head_sha) do
-    GitHub.upsert_check_run_from_github!(pull_request_id, %{head_sha: head_sha})
-    |> GitHub.send_pending_check_run()
   end
 end

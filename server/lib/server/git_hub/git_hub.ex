@@ -1,6 +1,7 @@
 defmodule Server.GitHub do
   alias Server.GitHub.{Repository, PullRequest, CheckRun, ApiClient}
   alias Server.Repo
+  import Ecto.Query
 
   def delete_repositories_from_github(github_ids) do
     Repo.delete_repositories(github_ids)
@@ -30,24 +31,45 @@ defmodule Server.GitHub do
     |> Repo.insert_or_update()
   end
 
-  def upsert_check_run_from_github!(pull_request_github_id, %{head_sha: head_sha} = attrs) do
-    pull_request = Repo.get_by!(PullRequest, github_id: pull_request_github_id)
+  def send_queued_check_run(pr_github_id, head_sha, owner_name) do
+    {pull_request, check_run} = upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha})
 
-    if check_run = Repo.get_by(pull_request.assoc(:check_runs), head_sha: head_sha) do
-      check_run
-    else
-      pull_request.build_assoc(:check_runs)
-      |> CheckRun.changeset(attrs)
-      |> Repo.insert_or_update!()
-    end
+    repo =
+      from(
+        r in Repository,
+        join: p in assoc(r, :pull_requests),
+        select: r.name,
+        where: p.id == ^pull_request.id
+      )
+      |> Server.Repo.one()
+
+    ApiClient.send_check_run(
+      owner_name,
+      repo.name,
+      %{
+        head_sha: check_run.head_sha,
+        external_id: check_run.id,
+        status: "queued",
+        started_at: check_run.inserted_at
+      }
+    )
   end
 
-  def send_pending_check_run(%CheckRun{} = check_run) do
-    ApiClient.send_pending_check_run(%{
-      head_sha: check_run.head_sha,
-      external_id: check_run.id,
-      status: "queued",
-      started_at: check_run.inserted_at
-    })
+  @spec upsert_check_run_from_github!(String.t(), map) :: CheckRun | {PullRequest, CheckRun}
+  defp upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha} = attrs) do
+    pull_request = Repo.get_by!(PullRequest, github_id: pr_github_id)
+
+    check_run =
+      case Repo.get_by(pull_request.assoc(:check_runs), head_sha: head_sha) do
+        nil ->
+          pull_request.build_assoc(:check_runs)
+          |> CheckRun.changeset(attrs)
+          |> Repo.insert_or_update!()
+
+        check_run ->
+          check_run
+      end
+
+    {pull_request, check_run}
   end
 end

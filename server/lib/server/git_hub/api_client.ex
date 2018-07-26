@@ -11,7 +11,8 @@ defmodule Server.GitHub.ApiClient do
     client_secret: Application.get_env(:server, :github_oauth_client_secret)
   )
 
-  def send_pending_check_run(repo_owner, repo_name, %{external_id: id} = attrs) do
+  @spec post(String.t(), String.t(), map) :: Tesla.Env.result()
+  def send_check_run(repo_owner, repo_name, %{external_id: id} = attrs) do
     body =
       Map.merge(attrs, %{
         name: "check-diff",

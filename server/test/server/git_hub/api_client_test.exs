@@ -5,8 +5,14 @@ defmodule Server.GitHub.ApiTest do
 
   import Tesla.Mock
 
-  describe "send_pending_check_run" do
-    setup do
+  describe "send_check_run/3" do
+    test "hits the GitHub Checks API endpoint with the passed data" do
+      data = %{
+        external_id: 123,
+        status: "in_progress",
+        details_url: "123"
+      }
+
       mock(fn
         %{
           method: :post,
@@ -15,25 +21,15 @@ defmodule Server.GitHub.ApiTest do
             {"content-type", "application/json"},
             {"accept", "application/vnd.github.v3+json"}
           ],
-          query: [client_id: "1234", client_secret: "abcd"]
+          # Auth headers
+          query: [client_id: "1234", client_secret: "abcd"],
+          body:
+            "{\"details_url\":\"123\",\"external_id\":123,\"name\":\"check-diff\",\"status\":\"in_progress\"}"
         } ->
           json(%{"id" => 4})
-
-        params ->
-          raise ArgumentError, "Mock called with unexpected params" <> inspect(params)
       end)
 
-      :ok
-    end
-
-    test "it hits the GitHub Checks API endpoint" do
-      data = %{
-        external_id: 123,
-        status: "in_progress",
-        details_url: "123"
-      }
-
-      assert ApiClient.send_pending_check_run("bessey", "checklint", data) ==
+      assert ApiClient.send_check_run("bessey", "checklint", data) ==
                {:ok,
                 %Tesla.Env{
                   body: %{"id" => 4},
