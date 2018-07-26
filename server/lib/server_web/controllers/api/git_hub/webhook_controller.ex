@@ -8,7 +8,10 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
   def create(%{assigns: %{github_event: event}} = conn, payload) do
     Logger.debug("Processing Event: '#{event}'")
     response = process_event(event, payload)
-    json(conn, response)
+
+    conn
+    |> put_status(response.status)
+    |> json(response)
   end
 
   defp process_event("check_suite", %{"action" => "requested"} = payload),
@@ -47,10 +50,12 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     with {:ok, repo} <-
            GitHub.upsert_repo_from_github(payload["repository"]["id"], repository_attrs),
          {:ok, _} <-
-           GitHub.upsert_pull_request_from_github(payload["number"], %{repository_id: repo.id}) do
+           GitHub.upsert_pull_request_from_github(payload["pull_request"]["id"], %{
+             repository_id: repo.id
+           }) do
       %{status: :created}
     else
-      error -> %{status: :error, error: inspect(error)}
+      error -> %{status: :bad_request, error: inspect(error)}
     end
   end
 

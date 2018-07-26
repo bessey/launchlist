@@ -9,11 +9,8 @@ defmodule Server.GitHub do
 
   def upsert_repo_from_github(repo_github_id, attrs) do
     case Repo.get_by(Repository, github_id: repo_github_id) do
-      nil ->
-        %Repository{github_id: repo_github_id}
-
-      repo ->
-        repo
+      nil -> %Repository{github_id: repo_github_id}
+      repo -> repo
     end
     |> Repository.changeset(attrs)
     |> Repo.insert_or_update()
@@ -21,11 +18,8 @@ defmodule Server.GitHub do
 
   def upsert_pull_request_from_github(pr_github_id, attrs) do
     case Repo.get_by(PullRequest, github_id: pr_github_id) do
-      nil ->
-        %PullRequest{github_id: pr_github_id}
-
-      pull_request ->
-        pull_request
+      nil -> %PullRequest{}
+      pull_request -> pull_request
     end
     |> PullRequest.changeset(attrs)
     |> Repo.insert_or_update()

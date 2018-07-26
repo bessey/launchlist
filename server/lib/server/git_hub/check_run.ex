@@ -13,7 +13,8 @@ defmodule Server.GitHub.CheckRun do
   @doc false
   def changeset(check_run, attrs) do
     check_run
-    |> cast(attrs, [:head_sha])
+    |> cast(attrs, [:head_sha, :pull_request_id])
+    |> assoc_constraint(:pull_request)
     |> validate_required([:head_sha, :pull_request_id])
   end
 end
