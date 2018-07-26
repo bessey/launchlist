@@ -2,6 +2,7 @@ defmodule Server.GitHub do
   alias Server.GitHub.{Repository, PullRequest, CheckRun, ApiClient}
   alias Server.Repo
   import Ecto.Query
+  import Ecto
 
   def delete_repositories_from_github(github_ids) do
     Repo.delete_repositories(github_ids)
@@ -28,7 +29,7 @@ defmodule Server.GitHub do
   def send_queued_check_run(pr_github_id, head_sha, owner_name) do
     {pull_request, check_run} = upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha})
 
-    repo =
+    repo_name =
       from(
         r in Repository,
         join: p in assoc(r, :pull_requests),
@@ -39,7 +40,7 @@ defmodule Server.GitHub do
 
     ApiClient.send_check_run(
       owner_name,
-      repo.name,
+      repo_name,
       %{
         head_sha: check_run.head_sha,
         external_id: check_run.id,
@@ -49,14 +50,29 @@ defmodule Server.GitHub do
     )
   end
 
-  @spec upsert_check_run_from_github!(String.t(), map) :: CheckRun | {PullRequest, CheckRun}
+  @spec upsert_check_run_from_github!(integer, map) :: CheckRun | {PullRequest, CheckRun}
   defp upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha} = attrs) do
-    pull_request = Repo.get_by!(PullRequest, github_id: pr_github_id)
+    pull_request =
+      from(
+        p in PullRequest,
+        where: p.github_id == ^pr_github_id,
+        limit: 1
+      )
+      |> Repo.one!()
 
     check_run =
-      case Repo.get_by(pull_request.assoc(:check_runs), head_sha: head_sha) do
+      from(
+        c in assoc(pull_request, :check_runs),
+        where: c.head_sha == ^head_sha,
+        limit: 1
+      )
+      |> Repo.one()
+
+    check_run =
+      case check_run do
         nil ->
-          pull_request.build_assoc(:check_runs)
+          pull_request
+          |> build_assoc(:check_runs)
           |> CheckRun.changeset(attrs)
           |> Repo.insert_or_update!()
 

@@ -69,9 +69,9 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
 
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
       GitHub.send_queued_check_run(
-        pr["id"],
-        payload["check_suit"]["head_sha"],
-        payload["repository"]["owner"]["login"]
+        Map.fetch!(pr, "id"),
+        Map.fetch!(payload["check_suite"], "head_sha"),
+        Map.fetch!(payload["repository"]["owner"], "login")
       )
     end)
 
