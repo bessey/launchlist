@@ -1,4 +1,4 @@
-defmodule Server.CheckResult do
+defmodule Server.Checker.Parser do
   defmodule TriggerSet do
     @enforce_keys [:paths]
     defstruct [:paths]
@@ -14,19 +14,18 @@ defmodule Server.CheckResult do
     defstruct [:category, :checks, :triggers]
   end
 
-  defmodule Root do
+  defmodule Result do
     @enforce_keys [:name, :version, :list]
     defstruct [:name, :version, :triggers, :list]
   end
 
-  @doc """
-    Convert untyped map to nested structs
-  """
-  def from_result_set(data) do
-    Enum.map(data, &parse_single_result/1)
+  defmodule ResultSet do
+    @enforce_keys [:results, :version]
+    defstruct [:results, :version]
   end
 
-  def parse_single_result(result) do
+  @spec parse_single_result(map) :: %Result{}
+  def parse_single_result(%{} = result) do
     struct!(Root, %{
       name: result["name"],
       version: result["version"],
@@ -35,21 +34,24 @@ defmodule Server.CheckResult do
     })
   end
 
-  defp parse_check_set(check_set) do
+  @spec parse_check_set(map) :: %CheckSet{}
+  defp parse_check_set(%{} = check_set) do
     struct!(CheckSet, %{
       category: check_set["category"],
       checks: Enum.map(check_set["checks"], &parse_check/1)
     })
   end
 
-  defp parse_check(check) do
+  @spec parse_check(map) :: %Check{}
+  defp parse_check(%{} = check) do
     struct(Check, %{
       check: check["check"],
       triggers: parse_trigger_set(check["trigger_set"])
     })
   end
 
-  defp parse_trigger_set(trigger_set) do
+  @spec parse_trigger_set(map) :: %TriggerSet{}
+  defp parse_trigger_set(%{} = trigger_set) do
     struct!(TriggerSet, %{paths: trigger_set["paths"]})
   end
 end

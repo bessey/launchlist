@@ -3,7 +3,7 @@ defmodule Server.Checker.CheckResult do
   import Ecto.Changeset
 
   schema "check_results" do
-    field(:category, :string)
+    field(:name, :string)
     field(:result, :map)
     belongs_to(:check_result_set, Server.Checker.CheckResultSet)
 
@@ -13,7 +13,7 @@ defmodule Server.Checker.CheckResult do
   @doc false
   def changeset(check_result, attrs) do
     check_result
-    |> cast(attrs, [:category, :result])
-    |> validate_required([:category, :result, :check_result_set_id])
+    |> cast(attrs, [:name, :result])
+    |> validate_required([:name, :result, :check_result_set_id])
   end
 end

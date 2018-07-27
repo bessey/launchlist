@@ -8,6 +8,10 @@ defmodule Server.GitHub do
     Repo.delete_repositories(github_ids)
   end
 
+  def get_repository_by_token(token) do
+    Repo.get_by(Repository, token: token)
+  end
+
   def upsert_repo_from_github(repo_github_id, %{} = attrs) do
     case Repo.get_by(Repository, github_id: repo_github_id) do
       nil -> %Repository{github_id: repo_github_id}

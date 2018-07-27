@@ -3,7 +3,7 @@ defmodule Server.Repo.Migrations.CreateCheckResults do
 
   def change do
     create table(:check_results) do
-      add(:category, :string, null: false)
+      add(:name, :string, null: false)
       add(:result, :map, null: false)
 
       add(
