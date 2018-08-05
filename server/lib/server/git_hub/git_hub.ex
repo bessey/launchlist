@@ -23,22 +23,17 @@ defmodule Server.GitHub do
 
   def upsert_pull_request_from_github(pr_github_id, %{} = attrs) do
     case Repo.get_by(PullRequest, github_id: pr_github_id) do
-      nil -> %PullRequest{}
+      nil -> %PullRequest{github_id: pr_github_id}
       pull_request -> pull_request
     end
     |> PullRequest.changeset(attrs)
     |> Repo.insert_or_update()
   end
 
-  @spec upsert_check_run_from_github!(integer, map) :: {%PullRequest{}, %CheckRun{}}
-  def upsert_check_run_from_github!(pr_github_id, %{head_sha: head_sha} = attrs) do
-    pull_request =
-      from(
-        p in PullRequest,
-        where: p.github_id == ^pr_github_id,
-        limit: 1
-      )
-      |> Repo.one!()
+  @spec upsert_check_run_from_github!(integer(), integer(), %{head_sha: any()}) ::
+          {%PullRequest{}, %CheckRun{}}
+  def upsert_check_run_from_github!(repo_id, pr_github_id, %{head_sha: head_sha} = attrs) do
+    {:ok, pull_request} = upsert_pull_request_from_github(pr_github_id, %{repository_id: repo_id})
 
     check_run =
       from(

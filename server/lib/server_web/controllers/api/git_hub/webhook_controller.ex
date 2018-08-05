@@ -67,13 +67,19 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
       owner_name = Map.fetch!(payload["repository"]["owner"], "login")
 
+      {:ok, repo} =
+        GitHub.upsert_repo_from_github(payload["repository"]["id"], %{
+          name: payload["repository"]["name"]
+        })
+
       {pull_request, check_run} =
         GitHub.upsert_check_run_from_github!(
+          repo.id,
           Map.fetch!(pr, "id"),
           %{head_sha: Map.fetch!(payload["check_suite"], "head_sha")}
         )
 
-      check_result_set =
+      {:ok, check_result_set} =
         check_run
         |> Ecto.build_assoc(:check_result_set)
         |> Map.from_struct()

@@ -17,7 +17,7 @@ defmodule Server.Checker.CheckResultSet do
   @doc false
   def changeset(check_result_set, attrs) do
     check_result_set
-    |> cast(attrs, [:version, :status])
-    |> validate_required([:version, :status, :check_run_id])
+    |> cast(attrs, [:version, :status, :check_run_id])
+    |> validate_required([:status, :check_run_id])
   end
 end
