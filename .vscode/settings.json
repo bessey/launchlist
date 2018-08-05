@@ -1,5 +1,14 @@
 {
   "elixirLS.projectDir": "server",
   "editor.formatOnSave": true,
-  "elixirLS.dialyzerEnabled": true
+  "elixirLS.dialyzerEnabled": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "server/_build/": true,
+    "server/.elixir_ls/": true
+  }
 }
