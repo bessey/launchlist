@@ -26,32 +26,32 @@ defmodule Server.Checker.Parser do
 
   @spec parse_single_result(map) :: %Result{}
   def parse_single_result(%{} = result) do
-    struct!(Root, %{
+    %Result{
       name: result["name"],
       version: result["version"],
       triggers: parse_trigger_set(result["triggers"]),
       list: Enum.map(result["list"], &parse_check_set/1)
-    })
+    }
   end
 
   @spec parse_check_set(map) :: %CheckSet{}
   defp parse_check_set(%{} = check_set) do
-    struct!(CheckSet, %{
+    %CheckSet{
       category: check_set["category"],
       checks: Enum.map(check_set["checks"], &parse_check/1)
-    })
+    }
   end
 
   @spec parse_check(map) :: %Check{}
   defp parse_check(%{} = check) do
-    struct(Check, %{
+    %Check{
       check: check["check"],
       triggers: parse_trigger_set(check["trigger_set"])
-    })
+    }
   end
 
   @spec parse_trigger_set(map) :: %TriggerSet{}
   defp parse_trigger_set(%{} = trigger_set) do
-    struct!(TriggerSet, %{paths: trigger_set["paths"]})
+    %TriggerSet{paths: trigger_set["paths"]}
   end
 end

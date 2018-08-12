@@ -4,6 +4,8 @@ defmodule Server.Repo.Migrations.CreatePullRequests do
   def change do
     create table(:pull_requests) do
       add(:github_id, :integer, null: false)
+      add(:base_branch, :string, null: false)
+      add(:head_branch, :string, null: false)
       add(:repository_id, references(:repositories, on_delete: :delete_all), null: false)
 
       timestamps()

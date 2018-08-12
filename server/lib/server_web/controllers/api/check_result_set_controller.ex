@@ -10,14 +10,17 @@ defmodule ServerWeb.Api.CheckResultSetController do
     case GitHub.get_repository_by_token(token) do
       nil ->
         put_status(conn, :unauthorized)
+        |> json(%{error: "Could not find repository for auth token"})
 
       repo ->
         Logger.info("New check result set for Repo #{repo.id} (#{repo.name})")
         result_set = Checker.parse_result_set(data)
 
+        # TODO connect this to a check run somehow
         trans =
           Repo.transaction(fn ->
-            check_result_set = Checker.create_check_result_set(%{version: result_set.version})
+            {:ok, check_result_set} =
+              Checker.create_check_result_set(%{version: result_set.version})
 
             Enum.map(result_set.results, fn result ->
               create_check_result(check_result_set, result)
@@ -29,6 +32,10 @@ defmodule ServerWeb.Api.CheckResultSetController do
           {:error, data} -> conn |> put_status(:not_acceptable) |> json(%{error: data})
         end
     end
+  end
+
+  def create(conn, _) do
+    put_status(conn, :bad_request) |> json(%{error: "Missing 'token' and / or 'results'"})
   end
 
   defp create_check_result(check_result_set, %Checker.Parser.Result{} = result) do

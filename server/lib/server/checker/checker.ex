@@ -49,8 +49,8 @@ defmodule Server.Checker do
   @doc """
     Convert untyped map to nested structs
   """
-  @spec parse_result_set(map) :: %Parser.ResultSet{}
-  def parse_result_set(%{} = data) do
+  @spec parse_result_set(list) :: %Parser.ResultSet{}
+  def parse_result_set(data) do
     results = Enum.map(data, &Parser.parse_single_result/1)
     version = List.first(results).version
     %Parser.ResultSet{results: results, version: version}

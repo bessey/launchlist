@@ -50,7 +50,11 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
 
     with repo_attrs <- %{name: payload["repository"]["name"]},
          {:ok, repo} <- GitHub.upsert_repo_from_github(repo_github_id, repo_attrs),
-         pr_attrs <- %{repository_id: repo.id},
+         pr_attrs <- %{
+           repository_id: repo.id,
+           base_branch: payload["pull_request"]["base"]["ref"],
+           head_branch: payload["pull_request"]["head"]["ref"]
+         },
          {:ok, _} <- GitHub.upsert_pull_request_from_github(pr_github_id, pr_attrs) do
       %{status: :created}
     else
@@ -67,27 +71,35 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
       owner_name = Map.fetch!(payload["repository"]["owner"], "login")
 
-      {:ok, repo} =
-        GitHub.upsert_repo_from_github(payload["repository"]["id"], %{
-          name: payload["repository"]["name"]
-        })
-
-      {pull_request, check_run} =
-        GitHub.upsert_check_run_from_github!(
-          repo.id,
-          Map.fetch!(pr, "id"),
-          %{head_sha: Map.fetch!(payload["check_suite"], "head_sha")}
-        )
-
-      {:ok, check_result_set} =
-        check_run
-        |> Ecto.build_assoc(:check_result_set)
-        |> Map.from_struct()
-        |> Checker.create_check_result_set()
-
-      GitHub.send_queued_check_run(owner_name, pull_request, check_run, check_result_set)
+      with {:ok, repo} <-
+             GitHub.upsert_repo_from_github(payload["repository"]["id"], %{
+               name: payload["repository"]["name"]
+             }),
+           {:ok, pull_request} <-
+             GitHub.upsert_pull_request_from_github(pr["id"], %{
+               head_branch: pr["head"]["ref"],
+               base_branch: pr["base"]["ref"],
+               repository_id: repo.id
+             }),
+           {:ok, check_run} <-
+             GitHub.upsert_check_run_from_github(
+               pull_request,
+               %{
+                 head_sha: Map.fetch!(payload["check_suite"], "head_sha")
+               }
+             ),
+           {:ok, check_result_set} <-
+             check_run
+             |> Ecto.build_assoc(:check_result_set)
+             |> Map.from_struct()
+             |> Checker.create_check_result_set() do
+        GitHub.send_queued_check_run(owner_name, pull_request, check_run, check_result_set)
+      else
+        error -> raise inspect(error)
+      end
     end)
 
+    # TODO handle errors
     %{status: :accepted}
   end
 end

@@ -9,7 +9,7 @@ defmodule Server.GitHub do
   end
 
   def get_repository_by_token(token) do
-    Repo.get_by(Repository, token: token)
+    Repo.get_by(Repository, auth_token: token)
   end
 
   def upsert_repo_from_github(repo_github_id, %{} = attrs) do
@@ -30,11 +30,8 @@ defmodule Server.GitHub do
     |> Repo.insert_or_update()
   end
 
-  @spec upsert_check_run_from_github!(integer(), integer(), %{head_sha: any()}) ::
-          {%PullRequest{}, %CheckRun{}}
-  def upsert_check_run_from_github!(repo_id, pr_github_id, %{head_sha: head_sha} = attrs) do
-    {:ok, pull_request} = upsert_pull_request_from_github(pr_github_id, %{repository_id: repo_id})
-
+  @spec upsert_check_run_from_github(%PullRequest{}, %{head_sha: any()}) :: any()
+  def upsert_check_run_from_github(pull_request, %{head_sha: head_sha} = attrs) do
     check_run =
       from(
         c in assoc(pull_request, :check_runs),
@@ -43,19 +40,16 @@ defmodule Server.GitHub do
       )
       |> Repo.one()
 
-    check_run =
-      case check_run do
-        nil ->
-          pull_request
-          |> build_assoc(:check_runs)
-          |> CheckRun.changeset(attrs)
-          |> Repo.insert_or_update!()
+    case check_run do
+      nil ->
+        pull_request
+        |> build_assoc(:check_runs)
+        |> CheckRun.changeset(attrs)
+        |> Repo.insert_or_update()
 
-        check_run ->
-          check_run
-      end
-
-    {pull_request, check_run}
+      check_run ->
+        {:ok, check_run}
+    end
   end
 
   ### API CLIENT

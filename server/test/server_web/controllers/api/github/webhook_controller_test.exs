@@ -1,5 +1,5 @@
 defmodule ServerWeb.WebhookControllerTest do
-  use ServerWeb.ConnCase, async: true
+  use ServerWeb.ConnCase
 
   alias Server.Repo
   alias Server.GitHub.{CheckRun, PullRequest, Repository}
@@ -25,10 +25,17 @@ defmodule ServerWeb.WebhookControllerTest do
           }
         },
         "check_suite" => %{
+          "head_branch" => "my-feature",
           "head_sha" => "deadbeef",
           "pull_requests" => [
             %{
-              "id" => 123
+              "id" => 123,
+              "base" => %{
+                "ref" => "master"
+              },
+              "head" => %{
+                "ref" => "my-feature"
+              }
             }
           ]
         }
@@ -156,19 +163,27 @@ defmodule ServerWeb.WebhookControllerTest do
             "name" => "my-repo"
           },
           "pull_request" => %{
-            "id" => 321
+            "id" => 321,
+            "head" => %{
+              "ref" => "feature-branch"
+            },
+            "base" => %{
+              "ref" => "master"
+            }
           }
         })
 
       assert json_response(conn, :created)
 
       repo = Repo.get_by!(Repository, github_id: 123, name: "my-repo")
-      assert Repo.get_by(PullRequest, github_id: 321, repository_id: repo.id)
+      assert pr = Repo.get_by(PullRequest, github_id: 321, repository_id: repo.id)
+      assert "master" = pr.base_branch
+      assert "feature-branch" = pr.head_branch
     end
 
     test "updates existing pull request + repository record", %{conn: conn} do
-      repo = Repo.insert!(%Repository{github_id: 123, name: "existing", auth_token: "1234"})
-      Repo.insert!(%PullRequest{github_id: 321, repository_id: repo.id})
+      repo = Server.Factory.insert(:repository, %{github_id: 123, name: "existing"})
+      Server.Factory.insert(:pull_request, %{repository: repo})
 
       conn =
         conn
@@ -179,7 +194,13 @@ defmodule ServerWeb.WebhookControllerTest do
             "name" => "my-repo"
           },
           "pull_request" => %{
-            "id" => 321
+            "id" => 321,
+            "head" => %{
+              "ref" => "feature-branch"
+            },
+            "base" => %{
+              "ref" => "master"
+            }
           }
         })
 
