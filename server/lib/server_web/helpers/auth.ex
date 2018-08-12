@@ -11,8 +11,13 @@ defmodule ServerWeb.Helpers.Auth do
 
   @spec get_current_user(Plug.Conn.t()) :: nil | Server.Accounts.User
   def get_current_user(conn) do
-    user_id = Plug.Conn.get_session(conn, @current_user_id)
+    user_id = get_current_user_id(conn)
     if user_id, do: Server.Repo.get(Server.Accounts.User, user_id)
+  end
+
+  @spec get_current_user_id(Plug.Conn.t()) :: nil | Integer
+  def get_current_user_id(conn) do
+    Plug.Conn.get_session(conn, @current_user_id)
   end
 
   @spec sign_in_user(Plug.Conn.t(), any()) :: Plug.Conn.t()
