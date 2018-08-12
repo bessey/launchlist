@@ -4,6 +4,8 @@ defmodule ServerWeb.CheckResultSetController do
   alias Server.Checker.{CheckResultSet}
   import Ecto.Query
 
+  plug(ServerWeb.RequireAuth)
+
   def show(conn, %{"id" => id, "pull_request_id" => pr_id}) do
     case Repo.get(
            from(
@@ -17,7 +19,7 @@ defmodule ServerWeb.CheckResultSetController do
       nil ->
         conn
         |> put_status(:not_found)
-        |> put_view(HelloWeb.ErrorView)
+        |> put_view(ServerWeb.ErrorView)
         |> render("404.html")
 
       check_result_set ->

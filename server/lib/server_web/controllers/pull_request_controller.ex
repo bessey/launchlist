@@ -4,6 +4,8 @@ defmodule ServerWeb.PullRequestController do
   alias Server.GitHub.{PullRequest}
   import Ecto.Query
 
+  plug(ServerWeb.RequireAuth)
+
   def index(conn, _params) do
     pull_requests = Repo.all(PullRequest)
 
