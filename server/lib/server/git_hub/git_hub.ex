@@ -12,6 +12,15 @@ defmodule Server.GitHub do
     Repo.get_by(Repository, auth_token: token)
   end
 
+  def get_check_run_by_refs(base_branch, head_sha) do
+    from(
+      cr in CheckRun,
+      join: pr in assoc(cr, :pull_request),
+      where: pr.base_branch == ^base_branch and cr.head_sha == ^head_sha
+    )
+    |> Repo.one()
+  end
+
   def upsert_repo_from_github(repo_github_id, %{} = attrs) do
     case Repo.get_by(Repository, github_id: repo_github_id) do
       nil -> %Repository{github_id: repo_github_id}

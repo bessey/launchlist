@@ -18,4 +18,13 @@ defmodule Server.Factory do
       head_branch: branch_name
     }
   end
+
+  def check_run_factory do
+    head_sha = sequence(:head_sha, &"abcd#{&1}")
+
+    %Server.GitHub.CheckRun{
+      head_sha: head_sha,
+      pull_request: build(:pull_request)
+    }
+  end
 end
