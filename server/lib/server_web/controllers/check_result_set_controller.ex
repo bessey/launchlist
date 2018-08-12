@@ -21,7 +21,7 @@ defmodule ServerWeb.CheckResultSetController do
         |> render("404.html")
 
       check_result_set ->
-        render(conn, "show.html", check_result_set: check_result_set)
+        render(conn, "show.html", check_result_set: check_result_set, pull_request_id: pr_id)
     end
   end
 end

@@ -1,0 +1,7 @@
+<p><%= link "Back to Pull Request", to: pull_request_path(@conn, :show, assigns.pull_request_id) %></p>
+
+<p>Status: <%= Phoenix.Naming.humanize assigns.check_result_set.status %></p>
+
+<% for check_result <- assigns.check_result_set.check_results do %>
+  <%= inspect(assigns.check_result_set.result) %>
+<% end %>

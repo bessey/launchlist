@@ -3,7 +3,7 @@ defmodule Server.Checker.CheckResultSet do
   import Ecto.Changeset
   import EctoEnum, except: [cast: 3]
 
-  defenum(StatusEnum, new: 1, in_progress: 2, complete: 3)
+  defenum(StatusEnum, pending: 1, new: 2, in_progress: 3, complete: 4)
 
   schema "check_result_sets" do
     field(:status, StatusEnum, default: :new)

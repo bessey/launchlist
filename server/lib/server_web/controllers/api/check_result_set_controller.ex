@@ -63,9 +63,7 @@ defmodule ServerWeb.Api.CheckResultSetController do
   defp insert_check_results(check_run, result_set) do
     Repo.transaction(fn ->
       {:ok, check_result_set} =
-        Ecto.build_assoc(check_run, :check_result_set, %{version: result_set.version})
-        |> Map.from_struct()
-        |> Checker.create_check_result_set()
+        Checker.upsert_check_result_set(check_run.id, %{version: result_set.version, status: :new})
 
       Enum.map(result_set.results, fn result ->
         create_check_result(check_result_set, result)

@@ -28,6 +28,15 @@ defmodule Server.Checker do
     |> Repo.insert()
   end
 
+  def upsert_check_result_set(check_run_id, attrs \\ %{}) do
+    case Repo.get_by(CheckResultSet, check_run_id: check_run_id) do
+      nil -> %CheckResultSet{check_run_id: check_run_id}
+      check_result_set -> check_result_set
+    end
+    |> CheckResultSet.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
   @doc """
   Creates a check_result.
 
