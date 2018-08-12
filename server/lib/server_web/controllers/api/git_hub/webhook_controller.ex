@@ -44,23 +44,11 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     %{status: :accepted}
   end
 
-  defp process_event("pull_request", %{"action" => "opened"} = payload) do
-    repo_github_id = Map.fetch!(payload["repository"], "id")
-    pr_github_id = Map.fetch!(payload["pull_request"], "id")
+  defp process_event("pull_request", %{"action" => "opened"} = payload),
+    do: pull_request_update(payload)
 
-    with repo_attrs <- %{name: payload["repository"]["name"]},
-         {:ok, repo} <- GitHub.upsert_repo_from_github(repo_github_id, repo_attrs),
-         pr_attrs <- %{
-           repository_id: repo.id,
-           base_branch: payload["pull_request"]["base"]["ref"],
-           head_branch: payload["pull_request"]["head"]["ref"]
-         },
-         {:ok, _} <- GitHub.upsert_pull_request_from_github(pr_github_id, pr_attrs) do
-      %{status: :created}
-    else
-      error -> %{status: :bad_request, error: inspect(error)}
-    end
-  end
+  defp process_event("pull_request", %{"action" => "synchronize"} = payload),
+    do: pull_request_update(payload)
 
   defp process_event(event, _) do
     Logger.debug("Unhandled Event #{event}")
@@ -101,5 +89,23 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
 
     # TODO handle errors
     %{status: :accepted}
+  end
+
+  defp pull_request_update(payload) do
+    repo_github_id = Map.fetch!(payload["repository"], "id")
+    pr_github_id = Map.fetch!(payload["pull_request"], "id")
+
+    with repo_attrs <- %{name: payload["repository"]["name"]},
+         {:ok, repo} <- GitHub.upsert_repo_from_github(repo_github_id, repo_attrs),
+         pr_attrs <- %{
+           repository_id: repo.id,
+           base_branch: payload["pull_request"]["base"]["ref"],
+           head_branch: payload["pull_request"]["head"]["ref"]
+         },
+         {:ok, _} <- GitHub.upsert_pull_request_from_github(pr_github_id, pr_attrs) do
+      %{status: :created}
+    else
+      error -> %{status: :bad_request, error: inspect(error)}
+    end
   end
 end

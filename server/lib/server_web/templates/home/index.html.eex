@@ -2,7 +2,12 @@
   <p>
     Welcome back, <%= @current_user.email %>
   </p>
-  <%= link("Logout", to: auth_path(@conn, :delete), method: :delete) %>
+  <p>
+    <%= link("Logout", to: auth_path(@conn, :delete), method: :delete) %>
+  </p>
+  <p>
+    <%= link("Pull Requests", to: pull_request_path(@conn, :index)) %>
+  </p>
 <% else %>
   <%= link("Login with GitHub", to: auth_path(@conn, :request, "github")) %>
 <% end %>

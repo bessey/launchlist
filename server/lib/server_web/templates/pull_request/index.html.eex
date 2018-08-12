@@ -2,6 +2,5 @@
   Total: <%= length(assigns.pull_requests) %>
 </p>
 <%= for pull_request <- assigns.pull_requests do %>
-  <p>ID: <%= pull_request.id %></p>
-  <p>Latest SHA: <%= latest_sha(List.first(pull_request.working_lists)) %></p>
+  <p><%= link "ID: #{pull_request.id}", to: pull_request_path(@conn, :show, pull_request.id) %></p>
 <% end %>

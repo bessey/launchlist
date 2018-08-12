@@ -1,0 +1,14 @@
+<p>ID: <%= assigns.pull_request.id %></p>
+<p>Latest SHA: <%= latest_sha(List.first(assigns.pull_request.check_runs)) %></p>
+<ul>
+  <%= for check_run <- assigns.pull_request.check_runs do %>
+    <li>
+      <%=
+        link(
+          "#{check_run.inserted_at}: #{check_run.head_sha}",
+          to: pull_request_check_result_set_path(@conn, :show, assigns.pull_request.id, check_run.check_result_set.id)
+        )
+      %>
+    </li>
+  <% end %>
+</ul>

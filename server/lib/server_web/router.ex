@@ -19,7 +19,8 @@ defmodule ServerWeb.Router do
 
     get("/", HomeController, :index)
 
-    resources("/pull_requests", PullRequestController, only: [:index]) do
+    resources("/pull-requests", PullRequestController, only: [:index, :show]) do
+      resources("/check-result-sets", CheckResultSetController, only: [:show])
     end
   end
 
@@ -34,7 +35,7 @@ defmodule ServerWeb.Router do
   scope "/api", ServerWeb.Api do
     pipe_through(:api)
 
-    resources("/check_result_sets", CheckResultSetController, only: [:create])
+    resources("/check-result-sets", CheckResultSetController, only: [:create])
 
     scope "/github", GitHub do
       post("/webhooks", WebhookController, :create)
