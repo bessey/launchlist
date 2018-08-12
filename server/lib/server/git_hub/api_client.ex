@@ -12,9 +12,10 @@ defmodule Server.GitHub.ApiClient do
     client_secret: Application.get_env(:server, :github_oauth_client_secret)
   )
 
-  @spec post(String.t(), String.t(), map) :: Tesla.Env.result()
-  def send_check_run(repo_owner, repo_name, %{external_id: id} = attrs) do
-    Logger.info("GitHub API: POST check-runs " <> repo_owner <> " " <> repo_name)
+  @spec send_check_run(String.t(), %{external_id: any()}) ::
+          {:error, any()} | {:ok, Tesla.Env.t()}
+  def send_check_run(repo_name, %{external_id: id} = attrs) do
+    Logger.info("GitHub API: POST check-runs #{repo_name}")
 
     body =
       Map.merge(attrs, %{
@@ -22,7 +23,12 @@ defmodule Server.GitHub.ApiClient do
         details_url: details_url(id)
       })
 
-    post("/repos/" <> repo_owner <> "/" <> repo_name <> "/check-runs", body)
+    post("/repos/#{repo_name}/check-runs", body)
+  end
+
+  @spec rest_client(String.t()) :: Tentacat.Client.t()
+  def rest_client(access_token) do
+    Tentacat.Client.new(%{access_token: access_token})
   end
 
   defp details_url(id) do

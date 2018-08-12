@@ -8,6 +8,13 @@ defmodule Server.Accounts.User do
     field(:github_id, :integer)
     field(:github_username, :string)
 
+    many_to_many(
+      :repositories,
+      Server.GitHub.Repository,
+      join_through: Server.GitHub.UserRepository,
+      on_replace: :delete
+    )
+
     timestamps()
   end
 

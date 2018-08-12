@@ -4,6 +4,7 @@ defmodule ServerWeb.WebhookControllerTest do
   alias Server.Repo
   alias Server.GitHub.{CheckRun, PullRequest, Repository}
   alias Server.Checker.{CheckResultSet}
+  alias Server.Factory
 
   import Tesla.Mock
 
@@ -19,7 +20,7 @@ defmodule ServerWeb.WebhookControllerTest do
         "action" => "requested",
         "repository" => %{
           "id" => 321,
-          "name" => "my-repo",
+          "full_name" => "tester/my-repo",
           "owner" => %{
             "login" => "person"
           }
@@ -49,7 +50,7 @@ defmodule ServerWeb.WebhookControllerTest do
       assert json_response(conn, :accepted)
 
       assert %{
-               name: "my-repo",
+               name: "tester/my-repo",
                github_id: 321
              } = Repo.get_by!(Repository, github_id: 321)
 
@@ -74,22 +75,22 @@ defmodule ServerWeb.WebhookControllerTest do
           "repositories_added" => [
             %{
               "id" => 123,
-              "name" => "one-repo"
+              "full_name" => "tester/one-repo"
             },
             %{
               "id" => 321,
-              "name" => "another-repo"
+              "full_name" => "tester/another-repo"
             }
           ]
         })
 
       assert json_response(conn, :created)
-      assert %{name: "one-repo"} = Repo.get_by!(Repository, github_id: 123)
-      assert %{name: "another-repo"} = Repo.get_by!(Repository, github_id: 321)
+      assert %{name: "tester/one-repo"} = Repo.get_by!(Repository, github_id: 123)
+      assert %{name: "tester/another-repo"} = Repo.get_by!(Repository, github_id: 321)
     end
 
     test "updates existing repositories with new data", %{conn: conn} do
-      Repo.insert!(%Repository{github_id: 123, name: "old-name", auth_token: "test"})
+      repo = Factory.insert(:repository)
 
       conn =
         conn
@@ -97,14 +98,14 @@ defmodule ServerWeb.WebhookControllerTest do
           "action" => "added",
           "repositories_added" => [
             %{
-              "id" => 123,
-              "name" => "renamed-repo"
+              "id" => repo.github_id,
+              "full_name" => "owner/renamed-repo"
             }
           ]
         })
 
       assert json_response(conn, :created)
-      assert %{name: "renamed-repo"} = Repo.get_by!(Repository, github_id: 123)
+      assert %{name: "owner/renamed-repo"} = Repo.get_by!(Repository, github_id: repo.github_id)
     end
   end
 
@@ -114,7 +115,7 @@ defmodule ServerWeb.WebhookControllerTest do
     end
 
     test "destroys repositories for each uninstall", %{conn: conn} do
-      Repo.insert!(%Repository{github_id: 123, name: "to-die", auth_token: "test"})
+      repo = Factory.insert(:repository)
 
       conn =
         conn
@@ -122,13 +123,13 @@ defmodule ServerWeb.WebhookControllerTest do
           "action" => "removed",
           "repositories_removed" => [
             %{
-              "id" => 123
+              "id" => repo.id
             }
           ]
         })
 
       assert json_response(conn, :accepted)
-      refute Repo.get_by(Repository, github_id: 123)
+      refute Repo.get_by(Repository, github_id: repo.id)
     end
 
     test "doesnt crash when repo already doesnt exist", %{conn: conn} do
@@ -160,7 +161,7 @@ defmodule ServerWeb.WebhookControllerTest do
           "action" => "opened",
           "repository" => %{
             "id" => 123,
-            "name" => "my-repo"
+            "full_name" => "tester/my-repo"
           },
           "pull_request" => %{
             "id" => 321,
@@ -175,15 +176,15 @@ defmodule ServerWeb.WebhookControllerTest do
 
       assert json_response(conn, :created)
 
-      repo = Repo.get_by!(Repository, github_id: 123, name: "my-repo")
+      repo = Repo.get_by!(Repository, github_id: 123, name: "tester/my-repo")
       assert pr = Repo.get_by(PullRequest, github_id: 321, repository_id: repo.id)
       assert "master" = pr.base_branch
       assert "feature-branch" = pr.head_branch
     end
 
     test "updates existing pull request + repository record", %{conn: conn} do
-      repo = Server.Factory.insert(:repository, %{github_id: 123, name: "existing"})
-      Server.Factory.insert(:pull_request, %{repository: repo})
+      repo = Factory.insert(:repository, %{github_id: 123, name: "owner/existing"})
+      Factory.insert(:pull_request, %{repository: repo})
 
       conn =
         conn
@@ -191,7 +192,7 @@ defmodule ServerWeb.WebhookControllerTest do
           "action" => "opened",
           "repository" => %{
             "id" => 123,
-            "name" => "my-repo"
+            "full_name" => "tester/my-repo"
           },
           "pull_request" => %{
             "id" => 321,
@@ -206,7 +207,7 @@ defmodule ServerWeb.WebhookControllerTest do
 
       assert json_response(conn, :created)
 
-      repo = Repo.get_by!(Repository, github_id: 123, name: "my-repo", id: repo.id)
+      repo = Repo.get_by!(Repository, github_id: 123, name: "tester/my-repo", id: repo.id)
       assert Repo.get_by(PullRequest, github_id: 321, repository_id: repo.id)
     end
   end

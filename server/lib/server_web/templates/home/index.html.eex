@@ -8,6 +8,11 @@
   <p>
     <%= link("Pull Requests", to: pull_request_path(@conn, :index)) %>
   </p>
+  <ul>
+    <%= for repo <- @repositories do %>
+      <li><%= repo.name %></li>
+    <% end %>
+  </ul>
 <% else %>
   <%= link("Login with GitHub", to: auth_path(@conn, :request, "github")) %>
 <% end %>

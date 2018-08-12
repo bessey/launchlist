@@ -39,7 +39,8 @@ defmodule Server.GitHub do
     |> Repo.insert_or_update()
   end
 
-  @spec upsert_check_run_from_github(%PullRequest{}, %{head_sha: any()}) :: any()
+  @spec upsert_check_run_from_github(%PullRequest{}, %{head_sha: any()}) ::
+          {:ok, any()} | {:error, any()}
   def upsert_check_run_from_github(pull_request, %{head_sha: head_sha} = attrs) do
     check_run =
       from(
@@ -63,8 +64,25 @@ defmodule Server.GitHub do
 
   ### API CLIENT
 
-  @spec send_queued_check_run(String.t(), %PullRequest{}, %CheckRun{}, map) :: any
-  def send_queued_check_run(owner_name, pull_request, check_run, %{id: external_id}) do
+  @spec update_repositories_for_user(Server.Accounts.User.t()) :: {:ok, any()} | {:error, any()}
+  def update_repositories_for_user(user) do
+    client = ApiClient.rest_client(user.access_token)
+
+    repos =
+      Tentacat.Repositories.list_mine(client)
+      |> Enum.map(&Server.GitHub.upsert_repo_from_github(&1["id"], %{name: &1["name"]}))
+      |> Enum.map(&elem(&1, 1))
+
+    user
+    |> Repo.preload(:repositories)
+    |> Server.Accounts.change_user()
+    |> Ecto.Changeset.put_assoc(:repositories, repos)
+    |> Repo.update()
+  end
+
+  @spec send_queued_check_run(%PullRequest{}, %CheckRun{}, map) ::
+          {:error, any()} | {:ok, Tesla.Env.t()}
+  def send_queued_check_run(pull_request, check_run, %{id: external_id}) do
     repo_name =
       from(
         r in Repository,
@@ -75,7 +93,6 @@ defmodule Server.GitHub do
       |> Server.Repo.one()
 
     ApiClient.send_check_run(
-      owner_name,
       repo_name,
       %{
         head_sha: check_run.head_sha,

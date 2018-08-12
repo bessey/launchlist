@@ -7,6 +7,7 @@ defmodule Server.GitHub.Repository do
     field(:name, :string)
     field(:github_id, :integer)
     has_many(:pull_requests, Server.GitHub.PullRequest)
+    many_to_many(:users, Server.Accounts.User, join_through: Server.GitHub.UserRepository)
 
     timestamps()
   end

@@ -12,5 +12,6 @@ defmodule Server.Repo.Migrations.CreateRepositories do
 
     create(index(:repositories, [:auth_token], unique: true))
     create(index(:repositories, [:github_id], unique: true))
+    create(index(:repositories, [:name], unique: true))
   end
 end

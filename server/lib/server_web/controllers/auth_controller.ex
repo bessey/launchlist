@@ -20,16 +20,16 @@ defmodule ServerWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    case Server.Accounts.get_or_create_from_auth(auth) do
-      {:ok, user} ->
-        conn
-        |> put_flash(
-          :info,
-          "Successfully authenticated, welcome #{user.github_username} / #{user.email}."
-        )
-        |> put_session(:current_user, user)
-        |> redirect(to: "/")
-
+    with {:ok, user} <- Server.Accounts.get_or_create_from_auth(auth),
+         {:ok, _} <- Server.GitHub.update_repositories_for_user(user) do
+      conn
+      |> put_flash(
+        :info,
+        "Successfully authenticated, welcome #{user.github_username} / #{user.email}."
+      )
+      |> put_session(:current_user, user)
+      |> redirect(to: "/")
+    else
       {:error, reason} ->
         conn
         |> put_flash(:error, reason)

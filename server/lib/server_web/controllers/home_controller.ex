@@ -3,6 +3,14 @@ defmodule ServerWeb.HomeController do
 
   def index(conn, _params) do
     current_user = get_session(conn, :current_user)
-    render(conn, "index.html", current_user: current_user)
+
+    repos =
+      if current_user do
+        Server.Repo.all(Ecto.assoc(current_user, :repositories), order: :name)
+      else
+        []
+      end
+
+    render(conn, "index.html", current_user: current_user, repositories: repos)
   end
 end

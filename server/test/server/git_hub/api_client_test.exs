@@ -5,7 +5,7 @@ defmodule Server.GitHub.ApiTest do
 
   import Tesla.Mock
 
-  describe "send_check_run/3" do
+  describe "send_check_run/2" do
     test "hits the GitHub Checks API endpoint with the passed data" do
       data = %{
         external_id: 123,
@@ -29,7 +29,7 @@ defmodule Server.GitHub.ApiTest do
           json(%{"id" => 4})
       end)
 
-      assert ApiClient.send_check_run("bessey", "checklint", data) ==
+      assert ApiClient.send_check_run("bessey/checklint", data) ==
                {:ok,
                 %Tesla.Env{
                   body: %{"id" => 4},

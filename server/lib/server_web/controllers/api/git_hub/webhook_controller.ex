@@ -29,7 +29,7 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     Logger.info("Adding #{length(payload["repositories_added"])} Repos")
 
     Enum.each(payload["repositories_added"], fn repo ->
-      GitHub.upsert_repo_from_github(repo["id"], %{name: repo["name"]})
+      GitHub.upsert_repo_from_github(repo["id"], %{name: repo["full_name"]})
     end)
 
     %{status: :created}
@@ -57,11 +57,9 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
 
   defp check_suite_requested(%{} = payload) do
     Enum.each(payload["check_suite"]["pull_requests"], fn pr ->
-      owner_name = Map.fetch!(payload["repository"]["owner"], "login")
-
       with {:ok, repo} <-
              GitHub.upsert_repo_from_github(payload["repository"]["id"], %{
-               name: payload["repository"]["name"]
+               name: payload["repository"]["full_name"]
              }),
            {:ok, pull_request} <-
              GitHub.upsert_pull_request_from_github(pr["id"], %{
@@ -81,7 +79,7 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
              |> Ecto.build_assoc(:check_result_set)
              |> Map.from_struct()
              |> Checker.create_check_result_set() do
-        GitHub.send_queued_check_run(owner_name, pull_request, check_run, check_result_set)
+        GitHub.send_queued_check_run(pull_request, check_run, check_result_set)
       else
         error -> raise inspect(error)
       end
@@ -95,7 +93,7 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
     repo_github_id = Map.fetch!(payload["repository"], "id")
     pr_github_id = Map.fetch!(payload["pull_request"], "id")
 
-    with repo_attrs <- %{name: payload["repository"]["name"]},
+    with repo_attrs <- %{name: payload["repository"]["full_name"]},
          {:ok, repo} <- GitHub.upsert_repo_from_github(repo_github_id, repo_attrs),
          pr_attrs <- %{
            repository_id: repo.id,
