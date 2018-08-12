@@ -16,6 +16,7 @@ defmodule Server.GitHub.Repository do
   def changeset(repository, attrs) do
     repository
     |> cast(attrs, [:auth_token, :name, :github_id])
+    |> unique_constraint(:name)
     |> unique_constraint(:github_id)
     |> generate_auth_token_if_empty()
     |> validate_required([:auth_token, :name, :github_id])

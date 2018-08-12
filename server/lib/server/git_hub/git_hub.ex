@@ -70,7 +70,7 @@ defmodule Server.GitHub do
 
     repos =
       Tentacat.Repositories.list_mine(client)
-      |> Enum.map(&Server.GitHub.upsert_repo_from_github(&1["id"], %{name: &1["name"]}))
+      |> Enum.map(&Server.GitHub.upsert_repo_from_github(&1["id"], %{name: &1["full_name"]}))
       |> Enum.map(&elem(&1, 1))
 
     user

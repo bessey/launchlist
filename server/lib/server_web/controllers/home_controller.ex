@@ -2,7 +2,7 @@ defmodule ServerWeb.HomeController do
   use ServerWeb, :controller
 
   def index(conn, _params) do
-    current_user = get_session(conn, :current_user)
+    current_user = get_current_user(conn)
 
     repos =
       if current_user do

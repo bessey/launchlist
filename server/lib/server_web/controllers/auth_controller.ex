@@ -27,12 +27,15 @@ defmodule ServerWeb.AuthController do
         :info,
         "Successfully authenticated, welcome #{user.github_username} / #{user.email}."
       )
-      |> put_session(:current_user, user)
+      |> sign_in_user(user.id)
       |> redirect(to: "/")
     else
       {:error, reason} ->
+        require IEx
+        IEx.pry()
+
         conn
-        |> put_flash(:error, reason)
+        |> put_flash(:error, String.slice(inspect(reason), 0, 1000))
         |> redirect(to: "/")
     end
   end
