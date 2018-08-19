@@ -22,7 +22,7 @@ defmodule Server.Checker.CheckResult do
   def alphabetical(query \\ Server.Checker.CheckResult) do
     from(
       cr in query,
-      order_by: fragment("? ->> ? ASC", cr.result, "category")
+      order_by: fragment("? ->> ? ASC", cr.result, "name")
     )
   end
 
