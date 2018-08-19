@@ -4,10 +4,14 @@ body {
   font-family: "Open Sans", "Helvetica Neue", sans-serif;
   background-color: #fbf9f4;
   color: #504d48;
+  line-height: 1.6;
 }
 
 header {
   border-bottom: 2px solid #e0d4b0;
+  display: flex;
+  align-items: center;
+  place-content: space-between;
 }
 header a.logo {
   text-decoration: none;
@@ -23,4 +27,21 @@ header a.logo {
 a,
 a:visited {
   color: #4475d6;
+}
+
+ul {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+li {
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+li:before {
+  content: "-";
+  padding-right: 0.5em;
+  width: 1em;
 }

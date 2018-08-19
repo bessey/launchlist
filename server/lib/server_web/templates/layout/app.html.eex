@@ -18,6 +18,17 @@
         <a href="/" class="logo">
           <h1>LaunchList</h1>
         </a>
+        <div class="side-nav">
+          <%= if user = current_user(@conn) do %>
+            <span>
+              <%= user.email %>
+              <%= link("(Sign out)", to: auth_path(@conn, :delete), method: :delete, class: "logout") %>
+            </span>
+          <% else %>
+            <%= link("Login with GitHub", to: auth_path(@conn, :request, "github")) %>
+          <% end %>
+        </div>
+
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>

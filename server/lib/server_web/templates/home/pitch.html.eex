@@ -1,0 +1,27 @@
+<p>
+  LaunchList helps developers merge and release new features and refactors, confident that they have not made the kind of simple but often missed mistakes that slip past linters and code review. It lets you store your institutional knowledge programatically, along side code, so that you can be reminded of potential business side-effects of changes, <i>before</i> they happen.
+</p>
+
+<p>
+  If you've ever...
+  <ul>
+    <li>
+      Had a launch go haywire from a migration that "worked on my machine"
+    </li>
+    <li>
+      Pulled master to find your development environment won't start, with no idea why
+    </li>
+    <li>
+      Had another team mad at Product for not notifying them of a launch first so they could prepare
+    </li>
+  </ul>
+  ... LaunchList is for you.
+</p>
+
+<p>
+  Simply specify in YAML <i>what</i> changes in <i>which</i> files trigger a particular check, and add our CLI tool to your CI suite. From there, we'll make sure you never miss a step again on your path to production.
+</p>
+
+<p>
+  <%= link("Login with GitHub", to: auth_path(@conn, :request, "github")) %>
+</p>
