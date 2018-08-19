@@ -3,7 +3,7 @@ require "http"
 module Checker
   class Uploader
     include Logging
-    DEFAULT_ENDPOINT = 'https://checklint.com/api/check_lists'
+    DEFAULT_ENDPOINT = 'https://launchlist.com/api/check_lists'
     def initialize(results)
       @results = results
     end

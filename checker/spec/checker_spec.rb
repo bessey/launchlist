@@ -5,7 +5,7 @@ RSpec.describe Checker do
 
   describe "#call" do
     before do
-      stub_request(:post, "https://checklint.com/api/check_lists").to_return(status: 200)
+      stub_request(:post, "https://launchlist.com/api/check_lists").to_return(status: 200)
     end
     it "returns true" do
       expect(Checker.run(

@@ -16,7 +16,7 @@ defmodule Server.GitHub.ApiTest do
       mock(fn
         %{
           method: :post,
-          url: "https://api.github.com/repos/bessey/checklint/check-runs",
+          url: "https://api.github.com/repos/bessey/launchlist/check-runs",
           headers: [
             {"content-type", "application/json"},
             {"accept", "application/vnd.github.v3+json"}
@@ -29,7 +29,7 @@ defmodule Server.GitHub.ApiTest do
           json(%{"id" => 4})
       end)
 
-      assert ApiClient.send_check_run("bessey/checklint", data) ==
+      assert ApiClient.send_check_run("bessey/launchlist", data) ==
                {:ok,
                 %Tesla.Env{
                   body: %{"id" => 4},

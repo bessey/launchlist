@@ -7,8 +7,6 @@ export default class CheckController extends Controller {
     fetch(this.formTarget.action, {
       body: new FormData(this.formTarget),
       method: "POST"
-    })
-      .then(response => response.text())
-      .then(body => eval(body));
+    }).then(response => response.text());
   }
 }

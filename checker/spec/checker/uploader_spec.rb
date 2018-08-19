@@ -5,7 +5,7 @@ RSpec.describe Checker::Uploader do
   describe "#upload" do
     context "with a valid ResultSet" do
       before do
-        stub_request(:post, "https://checklint.com/api/check_lists").to_return(status: 200)
+        stub_request(:post, "https://launchlist.com/api/check_lists").to_return(status: 200)
       end
 
       it "converts to JSON and hits the default endpoint" do
@@ -15,7 +15,7 @@ RSpec.describe Checker::Uploader do
         result_set = Checker::ResultSet.new("abcdef", 1, results)
         uploader = Checker::Uploader.new(result_set)
         expect(uploader.upload).to eq true
-        expect(WebMock).to have_requested(:post, "https://checklint.com/api/check_lists")
+        expect(WebMock).to have_requested(:post, "https://launchlist.com/api/check_lists")
           .once
           .with(body: hash_including({
             token: "abcdef",
