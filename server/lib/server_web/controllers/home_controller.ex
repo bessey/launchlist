@@ -1,12 +1,16 @@
 defmodule ServerWeb.HomeController do
   use ServerWeb, :controller
+  alias Server.GitHub.{Repository}
 
   def index(conn, _params) do
     current_user = get_current_user(conn)
 
     repos =
       if current_user do
-        Server.Repo.all(Ecto.assoc(current_user, :repositories), order: :name)
+        Repository
+        |> Repository.for_user(current_user)
+        |> Repository.alphabetical()
+        |> Server.Repo.all()
       else
         []
       end

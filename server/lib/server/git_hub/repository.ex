@@ -1,6 +1,7 @@
 defmodule Server.GitHub.Repository do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   schema "repositories" do
     field(:auth_token, :string)
@@ -20,6 +21,21 @@ defmodule Server.GitHub.Repository do
     |> unique_constraint(:github_id)
     |> generate_auth_token_if_empty()
     |> validate_required([:auth_token, :name, :github_id])
+  end
+
+  def for_user(query, user) do
+    from(
+      r in query,
+      join: u in assoc(r, :users),
+      where: u.id == ^user.id
+    )
+  end
+
+  def alphabetical(query) do
+    from(
+      r in query,
+      order_by: fragment("lower(?)", r.name)
+    )
   end
 
   defp generate_auth_token_if_empty(changeset) do
