@@ -1,11 +1,15 @@
 <div class="check-result-set">
   <h3>
-    <span class="repository">
-      <%= @check_result_set.check_run.pull_request.repository.name %>
-    </span>
-    <span class="pull-request">
-      #<%= @check_result_set.check_run.pull_request.github_id %>
-    </span>
+    <%= link(
+      @check_result_set.check_run.pull_request.repository.name,
+      to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}",
+      class: "repository")
+    %>
+    <%= link(
+      "##{@check_result_set.check_run.pull_request.github_id}",
+      to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}/pulls/#{@check_result_set.check_run.pull_request.github_id}",
+      class: "pull-request")
+    %>
   </h3>
   <%= for check_result <- @check_result_set.check_results do %>
     <h1>
