@@ -1,6 +1,6 @@
 <p><%= link "Back to Pull Request", to: pull_request_path(@conn, :show, @conn.params["pull_request_id"]) %></p>
 
-<%= for {check_result, i_result} <- Enum.with_index(@check_result_set.check_results) do %>
+<%= for check_result <- @check_result_set.check_results do %>
   <h1><%= check_result.name %></h1>
   <%= for {check_set, i_list} <- Enum.with_index(check_result.result.list) do %>
     <h2><%= check_set.category %></h2>
@@ -8,11 +8,10 @@
       <%= for {check, i_check} <- Enum.with_index(check_set.checks) do %>
         <li>
           <span data-controller="check">
-            <%= check_form @conn, fn f -> %>
-              <%= hidden_input(f, :result_index, value: i_result) %>
+            <%= check_form @conn, check_result.id, fn f -> %>
               <%= hidden_input(f, :check_set_index, value: i_list) %>
               <%= hidden_input(f, :check_index, value: i_check) %>
-              <%= checkbox(f, :name, checked: check.set, data: [action: "check#submit"]) %>
+              <%= checkbox(f, :set, checked: check.set, data: [action: "check#submit"]) %>
             <% end %>
           </span>
           <%= check.check %>

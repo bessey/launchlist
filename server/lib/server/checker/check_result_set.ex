@@ -34,7 +34,7 @@ defmodule Server.Checker.CheckResultSet do
   end
 
   @doc false
-  def changeset(check_result_set, attrs) do
+  def changeset(check_result_set, attrs \\ %{}) do
     check_result_set
     |> cast(attrs, [:version, :status, :check_run_id])
     |> assoc_constraint(:check_run)
