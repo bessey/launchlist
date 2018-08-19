@@ -1,7 +1,15 @@
-<p><%= link "Back to Pull Request", to: pull_request_path(@conn, :show, assigns.pull_request_id) %></p>
+<p><%= link "Back to Pull Request", to: pull_request_path(@conn, :show, @pull_request_id) %></p>
 
-<p>Status: <%= Phoenix.Naming.humanize assigns.check_result_set.status %></p>
+<p>Status: <%= Phoenix.Naming.humanize @check_result_set.status %></p>
 
-<% for check_result <- assigns.check_result_set.check_results do %>
-  <%= inspect(assigns.check_result_set.result) %>
+<%= for check_result <- @check_result_set.check_results do %>
+  <h1><%= check_result.name %></h1>
+  <%= for check_set <- check_result.result.list do %>
+    <h2><%= check_set.category %></h2>
+    <ul>
+      <%= for check <- check_set.checks do %>
+        <li><%= check.check %></li>
+      <% end %>
+    </ul>
+  <% end %>
 <% end %>

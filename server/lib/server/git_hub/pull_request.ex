@@ -21,12 +21,16 @@ defmodule Server.GitHub.PullRequest do
     |> validate_required([:github_id, :head_branch, :base_branch])
   end
 
-  def for_user(query, user) do
+  def for_user(query, %Server.Accounts.User{} = user) do
+    for_user(query, user.id)
+  end
+
+  def for_user(query, user_id) do
     from(
       pr in query,
       join: r in assoc(pr, :repository),
       join: u in assoc(r, :users),
-      where: u.id == ^user.id
+      where: u.id == ^user_id
     )
   end
 end

@@ -1,6 +1,7 @@
 defmodule Server.GitHub.CheckRun do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   schema "check_runs" do
     field(:head_sha, :string)

@@ -49,10 +49,10 @@ defmodule Server.Mixfile do
       {:tesla, "~> 1.0.0"},
       {:ueberauth_github, "~> 0.7"},
       {:ueberauth, "~> 0.4"},
+      {:ex_machina, "~> 2.2"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
-      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
-      {:ex_machina, "~> 2.2", only: :test}
+      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}
     ]
   end
 

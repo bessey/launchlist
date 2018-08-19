@@ -1,21 +1,17 @@
 defmodule ServerWeb.CheckResultSetController do
   use ServerWeb, :controller
   alias Server.{Repo}
-  alias Server.Checker.{CheckResultSet}
+  alias Server.Checker.{CheckResultSet, CheckResult}
   import Ecto.Query
 
   plug(ServerWeb.RequireAuth)
 
   def show(conn, %{"id" => id, "pull_request_id" => pr_id}) do
-    case Repo.get(
-           from(
-             c in CheckResultSet,
-             preload: [:check_results],
-             join: cr in assoc(c, :check_run),
-             where: cr.pull_request_id == ^pr_id
-           ),
-           id
-         ) do
+    case CheckResultSet
+         |> preload(check_results: ^CheckResult.alphabetical())
+         |> CheckResultSet.for_user(get_current_user(conn))
+         |> CheckResultSet.for_pull_request(pr_id)
+         |> Repo.get(id) do
       nil ->
         conn
         |> put_status(:not_found)

@@ -13,12 +13,7 @@ defmodule Server.Checker.Result do
   # just put the data back into an URI struct to be stored
   # in the loaded schema struct.
   def load(data) when is_map(data) do
-    data =
-      for {key, val} <- data do
-        {String.to_existing_atom(key), val}
-      end
-
-    {:ok, struct!(Server.Checker.Parser.Result, data)}
+    {:ok, Server.Checker.Parser.parse_single_result(data)}
   end
 
   # When dumping data to the database, we *expect* an URI struct

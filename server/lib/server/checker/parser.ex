@@ -46,7 +46,7 @@ defmodule Server.Checker.Parser do
   defp parse_check(%{} = check) do
     %Check{
       check: check["check"],
-      triggers: parse_trigger_set(check["trigger_set"])
+      triggers: parse_trigger_set(check["triggers"])
     }
   end
 
