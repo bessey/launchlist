@@ -50,6 +50,7 @@ defmodule Server.Mixfile do
       {:ueberauth_github, "~> 0.7"},
       {:ueberauth, "~> 0.4"},
       {:ex_machina, "~> 2.2"},
+      {:timex, "~> 3.1"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false}

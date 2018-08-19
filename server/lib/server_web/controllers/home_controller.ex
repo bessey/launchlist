@@ -1,6 +1,7 @@
 defmodule ServerWeb.HomeController do
   use ServerWeb, :controller
-  alias Server.GitHub.{Repository}
+  alias Server.Checker.{CheckResultSet}
+  import Ecto.Query
 
   def index(conn, _params) do
     current_user = get_current_user(conn)
@@ -12,12 +13,14 @@ defmodule ServerWeb.HomeController do
   end
 
   defp index_for(conn, current_user) do
-    repos =
-      Repository
-      |> Repository.for_user(current_user)
-      |> Repository.alphabetical()
+    check_result_sets =
+      CheckResultSet
+      |> CheckResultSet.for_user(current_user)
+      |> limit(10)
+      |> order_by(desc: :inserted_at)
+      |> preload(check_run: [pull_request: [:repository]])
       |> Server.Repo.all()
 
-    render(conn, "index.html", current_user: current_user, repositories: repos)
+    render(conn, "index.html", current_user: current_user, check_result_sets: check_result_sets)
   end
 end
