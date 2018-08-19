@@ -9,11 +9,12 @@ defmodule ServerWeb.CheckResultController do
   def update(conn, %{"id" => id, "pull_request_id" => pr_id, "check_params" => check_params}) do
     with check_result <- get_check_result(conn, pr_id, id),
          {:ok, _} <- update_single_check(check_result, check_params) do
-      redirect(
-        conn,
-        to:
-          pull_request_check_result_set_path(conn, :edit, pr_id, check_result.check_result_set_id)
-      )
+      render(conn, "update.js", check_result_set_id: check_result.check_result_set_id)
+      # redirect(
+      #   conn,
+      #   to:
+      #     pull_request_check_result_set_path(conn, :edit, pr_id, check_result.check_result_set_id)
+      # )
     else
       error ->
         conn |> send_resp(:bad_request, inspect(error))

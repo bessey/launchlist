@@ -1,4 +1,4 @@
-defmodule ServerWeb.CheckResultSetView do
+defmodule ServerWeb.CheckResultView do
   use ServerWeb, :view
 
   def check_form(conn, check_result_id, function) do
@@ -10,12 +10,7 @@ defmodule ServerWeb.CheckResultSetView do
         conn.params["pull_request_id"],
         check_result_id
       ),
-      [
-        as: "check_params",
-        method: "PUT",
-        data: [target: "check.form", remote: true],
-        class: "check-form"
-      ],
+      [as: "check_params", method: "PUT", data: [target: "check.form"], class: "check-form"],
       function
     )
   end
