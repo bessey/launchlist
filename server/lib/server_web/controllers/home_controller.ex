@@ -13,14 +13,28 @@ defmodule ServerWeb.HomeController do
   end
 
   defp index_for(conn, current_user) do
-    check_result_sets =
+    common_query =
       CheckResultSet
       |> CheckResultSet.for_user(current_user)
       |> limit(10)
-      |> order_by(desc: :inserted_at)
       |> preload(check_run: [pull_request: [:repository]])
+
+    new_check_result_sets =
+      common_query
+      |> order_by(desc: :inserted_at)
       |> Server.Repo.all()
 
-    render(conn, "index.html", current_user: current_user, check_result_sets: check_result_sets)
+    updated_check_result_sets =
+      common_query
+      |> order_by(desc: :updated_at)
+      |> Server.Repo.all()
+
+    render(
+      conn,
+      "index.html",
+      current_user: current_user,
+      new_check_result_sets: new_check_result_sets,
+      updated_check_result_sets: updated_check_result_sets
+    )
   end
 end
