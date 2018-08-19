@@ -20,3 +20,30 @@
 .check-result-set li input[type="checkbox"] {
   margin-left: 0.5em;
 }
+
+.check-result-set .heading {
+  display: flex;
+  place-content: space-between;
+  align-items: center;
+}
+
+.check-result-set .status {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.check-result-set .status-pending {
+  color: orange;
+}
+
+.check-result-set .status-in_progress {
+  color: orange;
+}
+
+.check-result-set .status-complete {
+  color: green;
+}
+
+.check-result-set .status-new {
+  color: aqua;
+}

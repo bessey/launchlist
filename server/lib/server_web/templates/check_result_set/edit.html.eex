@@ -1,16 +1,21 @@
 <div class="check-result-set">
-  <h3>
-    <%= link(
-      @check_result_set.check_run.pull_request.repository.name,
-      to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}",
-      class: "repository")
-    %>
-    <%= link(
-      "##{@check_result_set.check_run.pull_request.github_id}",
-      to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}/pulls/#{@check_result_set.check_run.pull_request.github_id}",
-      class: "pull-request")
-    %>
-  </h3>
+  <div class="heading">
+    <h3>
+      <%= link(
+        @check_result_set.check_run.pull_request.repository.name,
+        to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}",
+        class: "repository")
+      %>
+      <%= link(
+        "##{@check_result_set.check_run.pull_request.github_id}",
+        to: "https://github.com/#{@check_result_set.check_run.pull_request.repository.name}/pulls/#{@check_result_set.check_run.pull_request.github_id}",
+        class: "pull-request")
+      %>
+    </h3>
+    <div class="status status-<%= @check_result_set.status %>">
+      [<%= @check_result_set.status %>]
+    </div>
+  </div>
   <%= for check_result <- @check_result_set.check_results do %>
     <h1>
       <%= check_result.name %>
@@ -20,12 +25,12 @@
       <ul class="check-set">
         <%= for {check, i_check} <- Enum.with_index(check_set.checks) do %>
           <li>
-            <span class="toggle" data-controller="check" data-action="click->check#toggleAndSubmit">
+            <span class="toggle" data-controller="check">
               <%= check_form @conn, check_result.id, fn f -> %>
                 <%= hidden_input(f, :check_set_index, value: i_list) %>
                 <%= hidden_input(f, :check_index, value: i_check) %>
                 <%= checkbox(f, :set, checked: check.set, data: [action: "check#submit", target: "check.checkbox"]) %>
-                <span class="check">
+                <span class="check" data-action="click->check#toggleAndSubmit">
                   <%= check.check %>
                 </span>
               <% end %>

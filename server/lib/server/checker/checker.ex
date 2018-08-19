@@ -64,4 +64,16 @@ defmodule Server.Checker do
     version = List.first(results).version
     %Parser.ResultSet{results: results, version: version}
   end
+
+  def update_check_result_set_status(check_result_set_id) do
+    set =
+      CheckResultSet
+      |> preload(:check_results)
+      |> Repo.get(check_result_set_id)
+
+    new_status = Parser.status_for_result_set(set)
+
+    CheckResultSet.changeset(set, %{status: new_status})
+    |> Repo.update()
+  end
 end

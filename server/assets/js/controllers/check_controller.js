@@ -3,15 +3,24 @@ import { Controller } from "stimulus";
 export default class CheckController extends Controller {
   static targets = ["form", "checkbox"];
 
-  toggleAndSubmit() {
+  toggleAndSubmit(event) {
     this.checkboxTarget.checked = !this.checkboxTarget.checked;
-    this.submit();
+    this.submit(event);
   }
 
-  submit() {
-    fetch(this.formTarget.action, {
-      body: new FormData(this.formTarget),
-      method: "POST"
-    }).then(response => response.text());
+  submit(event) {
+    const PJAX = window.PJAX;
+    if (PJAX) {
+      PJAX.loadUrl(this.formTarget.action, {
+        // Don't scroll up on form submit
+        scrollTo: false,
+        requestOptions: {
+          formData: new FormData(this.formTarget),
+          requestMethod: "POST"
+        }
+      });
+    } else {
+      this.formTarget.submit();
+    }
   }
 }

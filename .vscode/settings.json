@@ -10,6 +10,5 @@
     "**/.DS_Store": true,
     "server/_build/": true,
     "server/.elixir_ls/": true
-  },
-  "elixir.projectPath": "server"
+  }
 }

@@ -10,7 +10,12 @@ defmodule ServerWeb.CheckResultView do
         conn.params["pull_request_id"],
         check_result_id
       ),
-      [as: "check_params", method: "PUT", data: [target: "check.form"], class: "check-form"],
+      [
+        as: "check_params",
+        method: "PUT",
+        data: [target: "check.form"],
+        class: "check-form js-Pjax"
+      ],
       function
     )
   end

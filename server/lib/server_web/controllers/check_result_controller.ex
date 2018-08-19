@@ -1,6 +1,6 @@
 defmodule ServerWeb.CheckResultController do
   use ServerWeb, :controller
-  alias Server.{Repo}
+  alias Server.{Repo, Checker}
   alias Server.Checker.{CheckResult, Check}
   alias Server.Checker.Parser.{Check}
 
@@ -8,7 +8,14 @@ defmodule ServerWeb.CheckResultController do
 
   def update(conn, %{"id" => id, "pull_request_id" => pr_id, "check_params" => check_params}) do
     with check_result <- get_check_result(conn, pr_id, id),
-         {:ok, _} <- update_single_check(check_result, check_params) do
+         {:ok, _} <- update_single_check(check_result, check_params),
+         {:ok, _} <- Checker.update_check_result_set_status(check_result.check_result_set_id) do
+      conn
+      |> put_resp_header(
+        "X-PJAX-URL",
+        pull_request_check_result_set_path(conn, :edit, pr_id, check_result.check_result_set_id)
+      )
+
       redirect(
         conn,
         to:

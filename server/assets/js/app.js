@@ -21,10 +21,10 @@ import "phoenix_html";
 // import socket from "./socket"
 
 import { Application } from "stimulus";
-import Turbolinks from "turbolinks";
+import Pjax from "pjax";
 import CheckController from "./controllers/check_controller";
 
 const application = Application.start();
 application.register("check", CheckController);
 
-Turbolinks.start();
+window.PJAX = new Pjax({});
