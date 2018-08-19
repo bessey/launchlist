@@ -6,7 +6,7 @@
       <%=
         link(
           "#{check_run.inserted_at}: #{check_run.head_sha}",
-          to: pull_request_check_result_set_path(@conn, :show, assigns.pull_request.id, check_run.check_result_set.id)
+          to: pull_request_check_result_set_path(@conn, :edit, assigns.pull_request.id, check_run.check_result_set.id)
         )
       %>
     </li>

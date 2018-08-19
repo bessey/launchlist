@@ -6,7 +6,7 @@ defmodule ServerWeb.CheckResultSetController do
 
   plug(ServerWeb.RequireAuth)
 
-  def show(conn, %{"id" => id, "pull_request_id" => pr_id}) do
+  def edit(conn, %{"id" => id, "pull_request_id" => pr_id}) do
     case CheckResultSet
          |> preload(check_results: ^CheckResult.alphabetical())
          |> CheckResultSet.for_user(get_current_user(conn))
@@ -19,7 +19,11 @@ defmodule ServerWeb.CheckResultSetController do
         |> render("404.html")
 
       check_result_set ->
-        render(conn, "show.html", check_result_set: check_result_set, pull_request_id: pr_id)
+        render(conn, "edit.html", check_result_set: check_result_set, pull_request_id: pr_id)
     end
+  end
+
+  def update(conn, %{"id" => id, "pull_request_id" => pr_id}) do
+    redirect(conn, to: pull_request_check_result_set_path(conn, :edit, pr_id, id))
   end
 end

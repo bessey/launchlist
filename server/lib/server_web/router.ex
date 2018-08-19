@@ -20,7 +20,7 @@ defmodule ServerWeb.Router do
     get("/", HomeController, :index)
 
     resources("/pull-requests", PullRequestController, only: [:index, :show]) do
-      resources("/check-result-sets", CheckResultSetController, only: [:show])
+      resources("/check-result-sets", CheckResultSetController, only: [:edit, :update])
     end
   end
 

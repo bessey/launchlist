@@ -5,8 +5,8 @@ defmodule Server.Checker.Parser do
   end
 
   defmodule Check do
-    @enforce_keys [:check]
-    defstruct [:check, :triggers]
+    @enforce_keys [:check, :set]
+    defstruct [:check, :triggers, :set]
   end
 
   defmodule CheckSet do
@@ -46,7 +46,8 @@ defmodule Server.Checker.Parser do
   defp parse_check(%{} = check) do
     %Check{
       check: check["check"],
-      triggers: parse_trigger_set(check["triggers"])
+      triggers: parse_trigger_set(check["triggers"]),
+      set: check["set"] || false
     }
   end
 

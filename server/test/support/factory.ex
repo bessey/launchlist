@@ -68,6 +68,7 @@ defmodule Server.Factory do
             checks: [
               %Parser.Check{
                 check: "Confirm the thing is a thing, and not a different thing",
+                set: true,
                 triggers: %Parser.TriggerSet{
                   paths: [
                     "test/me/out"
@@ -82,6 +83,7 @@ defmodule Server.Factory do
             checks: [
               %Parser.Check{
                 check: "Confirm the thing is a thing, and not a different thing",
+                set: false,
                 triggers: %Parser.TriggerSet{
                   paths: [
                     "test/me/out"
