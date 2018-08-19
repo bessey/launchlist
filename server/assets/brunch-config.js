@@ -20,6 +20,9 @@ exports.config = {
       // }
     },
     stylesheets: {
+      order: {
+        before: ["normalize.css/normalize.css"]
+      },
       joinTo: "css/app.css"
     },
     templates: {
@@ -59,6 +62,7 @@ exports.config = {
   },
 
   npm: {
-    enabled: true
+    enabled: true,
+    styles: { "normalize.css": ["normalize.css"] }
   }
 };

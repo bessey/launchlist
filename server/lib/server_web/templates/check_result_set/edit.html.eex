@@ -1,22 +1,24 @@
-<p><%= link "Back to Pull Request", to: pull_request_path(@conn, :show, @conn.params["pull_request_id"]) %></p>
-
-<%= for check_result <- @check_result_set.check_results do %>
-  <h1><%= check_result.name %></h1>
-  <%= for {check_set, i_list} <- Enum.with_index(check_result.result.list) do %>
-    <h2><%= check_set.category %></h2>
-    <ul>
-      <%= for {check, i_check} <- Enum.with_index(check_set.checks) do %>
-        <li>
-          <span data-controller="check">
-            <%= check_form @conn, check_result.id, fn f -> %>
-              <%= hidden_input(f, :check_set_index, value: i_list) %>
-              <%= hidden_input(f, :check_index, value: i_check) %>
-              <%= checkbox(f, :set, checked: check.set, data: [action: "check#submit"]) %>
-            <% end %>
-          </span>
-          <%= check.check %>
-        </li>
-      <% end %>
-    </ul>
+<div class="check-result-set">
+  <%= for check_result <- @check_result_set.check_results do %>
+    <h1><%= check_result.name %></h1>
+    <%= for {check_set, i_list} <- Enum.with_index(check_result.result.list) do %>
+      <h2><%= check_set.category %></h2>
+      <ul class="check-set">
+        <%= for {check, i_check} <- Enum.with_index(check_set.checks) do %>
+          <li>
+            <span class="toggle" data-controller="check" data-action="click->check#toggleAndSubmit">
+              <%= check_form @conn, check_result.id, fn f -> %>
+                <%= hidden_input(f, :check_set_index, value: i_list) %>
+                <%= hidden_input(f, :check_index, value: i_check) %>
+                <%= checkbox(f, :set, checked: check.set, data: [action: "check#submit", target: "check.checkbox"]) %>
+                <span class="check">
+                  <%= check.check %>
+                </span>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
   <% end %>
-<% end %>
+</div>

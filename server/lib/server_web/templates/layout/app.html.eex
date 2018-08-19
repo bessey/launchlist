@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Hello Server!</title>
+    <title>LaunchList</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
     <script async src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </head>
@@ -15,12 +15,9 @@
   <body>
     <div class="container">
       <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <h1>CheckLint</h1>
+        <a href="/">
+          <h1>LaunchList</h1>
+        </a>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>

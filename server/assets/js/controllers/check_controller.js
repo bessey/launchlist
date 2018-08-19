@@ -1,9 +1,14 @@
 import { Controller } from "stimulus";
 
 export default class CheckController extends Controller {
-  static targets = ["form"];
+  static targets = ["form", "checkbox"];
 
-  submit(e) {
+  toggleAndSubmit() {
+    this.checkboxTarget.checked = !this.checkboxTarget.checked;
+    this.submit();
+  }
+
+  submit() {
     fetch(this.formTarget.action, {
       body: new FormData(this.formTarget),
       method: "POST"
