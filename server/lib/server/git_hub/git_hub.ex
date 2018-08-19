@@ -21,6 +21,10 @@ defmodule Server.GitHub do
     |> Repo.one()
   end
 
+  @spec upsert_repo_from_github(any(), %{
+          optional(:__struct__) => none(),
+          optional(atom() | binary()) => any()
+        }) :: any()
   def upsert_repo_from_github(repo_github_id, %{} = attrs) do
     case Repo.get_by(Repository, github_id: repo_github_id) do
       nil -> %Repository{github_id: repo_github_id}
@@ -80,26 +84,28 @@ defmodule Server.GitHub do
     |> Repo.update()
   end
 
-  @spec send_queued_check_run(%PullRequest{}, %CheckRun{}, map) ::
+  @spec send_queued_check_run(%PullRequest{}, %CheckRun{}, String.t()) ::
           {:error, any()} | {:ok, Tesla.Env.t()}
-  def send_queued_check_run(pull_request, check_run, %{id: external_id}) do
-    repo_name =
-      from(
-        r in Repository,
-        join: p in assoc(r, :pull_requests),
-        select: r.name,
-        where: p.id == ^pull_request.id
-      )
-      |> Server.Repo.one()
+  def send_queued_check_run(pull_request, check_run, check_result_set_id) do
+    case from(
+           r in Repository,
+           join: p in assoc(r, :pull_requests),
+           where: p.id == ^pull_request.id
+         )
+         |> Server.Repo.one() do
+      nil ->
+        {:error, "Repo not found"}
 
-    ApiClient.send_check_run(
-      repo_name,
-      %{
-        head_sha: check_run.head_sha,
-        external_id: external_id,
-        status: "queued",
-        started_at: check_run.inserted_at
-      }
-    )
+      repo ->
+        ApiClient.send_check_run(
+          repo.name,
+          %{
+            head_sha: check_run.head_sha,
+            external_id: check_result_set_id,
+            status: "queued",
+            started_at: check_run.inserted_at
+          }
+        )
+    end
   end
 end

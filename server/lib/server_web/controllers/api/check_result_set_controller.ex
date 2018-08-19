@@ -53,11 +53,8 @@ defmodule ServerWeb.Api.CheckResultSetController do
   defp parse_result_set(repo, data) do
     Logger.info("New check result set for Repo #{repo.id} (#{repo.name})")
 
-    if(result_set = Checker.parse_result_set(data)) do
-      {:ok, result_set}
-    else
-      {:error, "Could not parse results"}
-    end
+    result_set = Checker.parse_result_set(data)
+    {:ok, result_set}
   end
 
   defp insert_check_results(check_run, result_set) do

@@ -79,7 +79,7 @@ defmodule ServerWeb.Api.GitHub.WebhookController do
              |> Ecto.build_assoc(:check_result_set)
              |> Map.from_struct()
              |> Checker.create_check_result_set() do
-        GitHub.send_queued_check_run(pull_request, check_run, check_result_set)
+        GitHub.send_queued_check_run(pull_request, check_run, check_result_set.id)
       else
         error -> raise inspect(error)
       end

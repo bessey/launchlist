@@ -1,7 +1,7 @@
 defmodule ServerWeb.PullRequestController do
   use ServerWeb, :controller
   alias Server.{Repo}
-  alias Server.GitHub.{Repository, PullRequest}
+  alias Server.GitHub.{PullRequest}
   import Ecto.Query
 
   plug(ServerWeb.RequireAuth)
