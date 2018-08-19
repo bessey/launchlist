@@ -1,6 +1,16 @@
 <div class="check-result-set">
+  <h3>
+    <span class="repository">
+      <%= @check_result_set.check_run.pull_request.repository.name %>
+    </span>
+    <span class="pull-request">
+      #<%= @check_result_set.check_run.pull_request.github_id %>
+    </span>
+  </h3>
   <%= for check_result <- @check_result_set.check_results do %>
-    <h1><%= check_result.name %></h1>
+    <h1>
+      <%= check_result.name %>
+    </h1>
     <%= for {check_set, i_list} <- Enum.with_index(check_result.result.list) do %>
       <h2><%= check_set.category %></h2>
       <ul class="check-set">

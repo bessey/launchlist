@@ -30,7 +30,10 @@ defmodule ServerWeb.CheckResultSetController do
 
   defp get_check_result_set(conn, pr_id, id) do
     CheckResultSet
-    |> preload(check_results: ^CheckResult.alphabetical())
+    |> preload(
+      check_results: ^CheckResult.alphabetical(),
+      check_run: [pull_request: [:repository]]
+    )
     |> CheckResultSet.for_user(get_current_user(conn))
     |> CheckResultSet.for_pull_request(pr_id)
     |> Repo.get(id)

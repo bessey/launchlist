@@ -15,7 +15,7 @@
   <body>
     <div class="container">
       <header class="header">
-        <a href="/">
+        <a href="/" class="logo">
           <h1>LaunchList</h1>
         </a>
       </header>

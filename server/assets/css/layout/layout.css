@@ -3,10 +3,15 @@ body {
   font-size: 16px;
   font-family: "Open Sans", "Helvetica Neue", sans-serif;
   background-color: #fbf9f4;
+  color: #504d48;
 }
 
 header {
   border-bottom: 2px solid #e0d4b0;
+}
+header a.logo {
+  text-decoration: none;
+  color: inherit;
 }
 
 .container {

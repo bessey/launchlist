@@ -7,3 +7,13 @@
 .check-result-set form {
   display: inline-block;
 }
+
+.check-result-set .repository,
+.check-result-set .pull-request {
+  color: #a29684;
+}
+
+.check-result-set .pull-request {
+  padding-left: 1em;
+}
+
